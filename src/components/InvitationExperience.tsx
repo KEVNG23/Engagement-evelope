@@ -37,8 +37,8 @@ export function InvitationExperience() {
       ref={scrollerRef}
       className={
         opened
-          ? "relative h-[100dvh] w-full overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] text-[#f3e8d5] touch-pan-y"
-          : "relative h-[100dvh] w-full overflow-hidden bg-[#3d1418] text-[#f3e8d5] touch-none"
+          ? "invite-scroller relative h-[100dvh] w-full overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] text-[#f3e8d5] touch-pan-y"
+          : "invite-scroller relative h-[100dvh] w-full overflow-hidden bg-[#3d1418] text-[#f3e8d5] touch-none"
       }
       style={{ WebkitOverflowScrolling: "touch" }}
     >
