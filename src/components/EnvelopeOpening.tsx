@@ -96,19 +96,16 @@ export function EnvelopeOpening({
 
   return (
     <section className="relative flex min-h-[100svh] min-h-[100dvh] w-full flex-col items-center justify-center bg-[#3d1418] px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-5 sm:py-10">
-      {/* Header fades away when open so the rising letter never covers the names */}
+      {/* Names stay visible — slightly smaller when open so they don’t collide with the letter */}
       <motion.div
-        className={`relative z-10 max-w-[22rem] text-center sm:max-w-none ${
-          isOpen ? "mb-2 h-0 overflow-hidden pointer-events-none" : "mb-5 sm:mb-8"
-        }`}
+        className="relative z-10 mb-4 max-w-[22rem] text-center sm:mb-6 sm:max-w-none"
         initial={false}
         animate={
           isOpen
-            ? { opacity: 0, y: -20 }
-            : { opacity: 1, y: 0 }
+            ? { opacity: 1, y: 0, scale: 0.82 }
+            : { opacity: 1, y: 0, scale: 1 }
         }
-        transition={luxuryTransition(0.4)}
-        aria-hidden={isOpen}
+        transition={luxuryTransition(0.45)}
       >
         <p
           className={`${displayFont.className} text-[9px] uppercase tracking-[0.28em] text-[#f3e8d5] sm:text-[11px] sm:tracking-[0.42em]`}
@@ -116,7 +113,7 @@ export function EnvelopeOpening({
           {invitation.inviteFrom}
         </p>
         <h1
-          className={`${scriptFont.className} mt-4 text-[clamp(2.75rem,14vw,5.5rem)] leading-[1.08] text-[#fff8ef]`}
+          className={`${scriptFont.className} mt-3 text-[clamp(2.75rem,14vw,5.5rem)] leading-[1.08] text-[#fff8ef]`}
         >
           Annie <span className="text-[0.9em]">&</span> Dũng
         </h1>
@@ -152,9 +149,9 @@ export function EnvelopeOpening({
                     rotateX: hovered ? 5 : 1,
                   }
                 : {
-                    y: letterUp ? -4 : 0,
-                    scale: letterUp ? 1.01 : 1,
-                    rotateX: isOpen ? 10 : 1,
+                    y: 0,
+                    scale: 1,
+                    rotateX: isOpen ? 8 : 1,
                   }
           }
           transition={
@@ -214,15 +211,23 @@ export function EnvelopeOpening({
               : null}
           </AnimatePresence>
 
-          {/* Native envelope ratio 800×579 — rectangle, not square */}
-          <div
-            className="pointer-events-none relative aspect-[800/579] w-full"
+          {/*
+            Same WIDTH closed → open. Closed is landscape; open is taller
+            portrait at the same width so the envelope does not shrink.
+          */}
+          <motion.div
+            className="pointer-events-none relative w-full"
             style={{ transformStyle: "preserve-3d" }}
+            initial={false}
+            animate={{
+              aspectRatio: isOpen ? "635 / 799" : "800 / 579",
+            }}
+            transition={luxuryTransition(0.55)}
           >
             <motion.div
-              className="absolute inset-0 overflow-hidden"
+              className="absolute inset-0"
               animate={{ opacity: isOpen ? 0 : 1 }}
-              transition={luxuryTransition(0.4)}
+              transition={luxuryTransition(0.35)}
             >
               <Image
                 src="/assets/envelope-closed.png"
@@ -236,10 +241,10 @@ export function EnvelopeOpening({
             </motion.div>
 
             <motion.div
-              className="absolute inset-0 overflow-visible"
+              className="absolute inset-0"
               initial={false}
               animate={{ opacity: isOpen ? 1 : 0 }}
-              transition={luxuryTransition(0.5, 0.15)}
+              transition={luxuryTransition(0.45, 0.1)}
             >
               <Image
                 src="/assets/envelope-open.png"
@@ -247,21 +252,21 @@ export function EnvelopeOpening({
                 fill
                 draggable={false}
                 sizes="440px"
-                className="pointer-events-none object-contain object-bottom"
+                className="pointer-events-none object-contain object-center drop-shadow-[0_22px_55px_rgba(0,0,0,0.5)]"
               />
             </motion.div>
 
             <motion.div
               aria-hidden
-              className="absolute left-1/2 top-[12%] z-10 w-[38%] max-w-[9.5rem] -translate-x-1/2 sm:w-[42%] sm:max-w-none"
+              className="absolute left-1/2 top-[18%] z-10 w-[44%] -translate-x-1/2 sm:w-[46%]"
               style={{ transformStyle: "preserve-3d" }}
               initial={false}
               animate={
                 letterUp
-                  ? { y: -56, opacity: 1, scale: 1.02 }
+                  ? { y: -72, opacity: 1, scale: 1.05 }
                   : isOpen
-                    ? { y: -8, opacity: 1, scale: 0.98 }
-                    : { y: 40, opacity: 0, scale: 0.94 }
+                    ? { y: -12, opacity: 1, scale: 1 }
+                    : { y: 56, opacity: 0, scale: 0.94 }
               }
               transition={luxuryTransition(TIMING.letterMs / 1000)}
             >
@@ -271,7 +276,7 @@ export function EnvelopeOpening({
                   alt=""
                   fill
                   draggable={false}
-                  sizes="200px"
+                  sizes="220px"
                   className="pointer-events-none object-contain"
                 />
                 <div className="absolute inset-[17%] flex flex-col items-center justify-center px-2 text-center">
@@ -304,7 +309,10 @@ export function EnvelopeOpening({
                 transformStyle: "preserve-3d",
                 backfaceVisibility: "hidden",
               }}
-              animate={{ rotateX: isOpen ? -180 : 0 }}
+              animate={{
+                rotateX: isOpen ? -180 : 0,
+                opacity: isOpen ? 0 : 1,
+              }}
               transition={luxuryTransition(TIMING.flapMs / 1000)}
             >
               <div
@@ -324,7 +332,7 @@ export function EnvelopeOpening({
                 />
               </div>
             </motion.div>
-          </div>
+          </motion.div>
 
           <motion.div
             aria-hidden
