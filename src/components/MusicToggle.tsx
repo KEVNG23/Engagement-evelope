@@ -5,9 +5,14 @@ import { useEffect, useRef, useState } from "react";
 
 type MusicToggleProps = {
   src?: string;
+  /** When true, try to start looping music (call from envelope open) */
+  autoPlay?: boolean;
 };
 
-export function MusicToggle({ src = "/assets/music.mp3" }: MusicToggleProps) {
+export function MusicToggle({
+  src = "/assets/music.mp3",
+  autoPlay = false,
+}: MusicToggleProps) {
   const reduceMotion = useReducedMotion();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -16,13 +21,12 @@ export function MusicToggle({ src = "/assets/music.mp3" }: MusicToggleProps) {
   useEffect(() => {
     let cancelled = false;
 
-    // Probe availability first so a missing file does not spam 404 / Next issue badge
     fetch(src, { method: "HEAD" })
       .then((res) => {
         if (cancelled || !res.ok) return;
         const audio = new Audio(src);
         audio.loop = true;
-        audio.volume = 0.35;
+        audio.volume = 0.28;
         audioRef.current = audio;
         setAvailable(true);
       })
@@ -36,6 +40,17 @@ export function MusicToggle({ src = "/assets/music.mp3" }: MusicToggleProps) {
       audioRef.current = null;
     };
   }, [src]);
+
+  useEffect(() => {
+    if (!autoPlay || !available) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio
+      .play()
+      .then(() => setPlaying(true))
+      .catch(() => setPlaying(false));
+  }, [autoPlay, available]);
 
   if (!available) return null;
 

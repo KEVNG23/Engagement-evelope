@@ -4,8 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { EnvelopeOpening } from "./EnvelopeOpening";
 import { FloatingParticles } from "./FloatingParticles";
+import { BackgroundSparkles } from "./BackgroundSparkles";
 import { InvitationDetails } from "./InvitationDetails";
 import { MusicToggle } from "./MusicToggle";
+import { playSoftPianoIntro } from "@/lib/softPiano";
 
 /**
  * Scroll lives on this container (not document), which is reliable on mobile /
@@ -14,10 +16,16 @@ import { MusicToggle } from "./MusicToggle";
 export function InvitationExperience() {
   const reduceMotion = useReducedMotion();
   const [opened, setOpened] = useState(false);
+  const [musicOn, setMusicOn] = useState(false);
   const scrollerRef = useRef<HTMLElement>(null);
 
   const unlockScroll = useCallback(() => {
     setOpened(true);
+  }, []);
+
+  const handleOpenStart = useCallback(() => {
+    playSoftPianoIntro(0.16);
+    setMusicOn(true);
   }, []);
 
   // Clear any leftover document lock from older deploys / cached HTML
@@ -42,7 +50,8 @@ export function InvitationExperience() {
       }
       style={{ WebkitOverflowScrolling: "touch" }}
     >
-      <FloatingParticles density={16} />
+      <BackgroundSparkles density={32} />
+      <FloatingParticles density={22} />
 
       <div
         aria-hidden
@@ -53,7 +62,11 @@ export function InvitationExperience() {
         <EnvelopeOpening
           opened={opened}
           onComplete={unlockScroll}
-          onSkip={unlockScroll}
+          onSkip={() => {
+            handleOpenStart();
+            unlockScroll();
+          }}
+          onOpenStart={handleOpenStart}
         />
 
         <motion.div
@@ -65,13 +78,17 @@ export function InvitationExperience() {
               ? { duration: 0 }
               : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }
           }
-          className={opened ? "pointer-events-auto" : "pointer-events-none h-0 overflow-hidden"}
+          className={
+            opened
+              ? "pointer-events-auto"
+              : "pointer-events-none h-0 overflow-hidden"
+          }
         >
           {opened ? <InvitationDetails /> : null}
         </motion.div>
       </div>
 
-      <MusicToggle />
+      <MusicToggle autoPlay={musicOn} />
     </main>
   );
 }

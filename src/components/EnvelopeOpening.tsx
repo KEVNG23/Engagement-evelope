@@ -13,6 +13,8 @@ type EnvelopeOpeningProps = {
   opened?: boolean;
   onComplete: () => void;
   onSkip: () => void;
+  /** Fires once when the user starts opening the envelope */
+  onOpenStart?: () => void;
 };
 
 /**
@@ -24,6 +26,7 @@ export function EnvelopeOpening({
   opened = false,
   onComplete,
   onSkip,
+  onOpenStart,
 }: EnvelopeOpeningProps) {
   const reduceMotion = useReducedMotion();
   const labelId = useId();
@@ -32,6 +35,7 @@ export function EnvelopeOpening({
   const phaseRef = useRef<EnvelopePhase>("idle");
   const completedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
+  const onOpenStartRef = useRef(onOpenStart);
   const timersRef = useRef<number[]>([]);
 
   useEffect(() => {
@@ -41,6 +45,10 @@ export function EnvelopeOpening({
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
+
+  useEffect(() => {
+    onOpenStartRef.current = onOpenStart;
+  }, [onOpenStart]);
 
   useEffect(() => {
     return () => {
@@ -65,12 +73,14 @@ export function EnvelopeOpening({
     if (reduceMotion) {
       completedRef.current = true;
       setPhase("done");
+      onOpenStartRef.current?.();
       onCompleteRef.current();
       return;
     }
 
     clearTimers();
     setPhase("opening");
+    onOpenStartRef.current?.();
 
     const letterDelay = TIMING.flapMs + TIMING.delayMs;
 
@@ -229,24 +239,49 @@ export function EnvelopeOpening({
                   transition={{ duration: 0.2, ease: "easeOut" }}
                 />
 
-                {/* Letter — only after lid is open */}
+                {/* Letter — unfolds + rises after lid opens */}
                 <motion.div
                   className="absolute left-1/2 w-[44%]"
                   style={{
                     top: "22%",
                     zIndex: letterUp ? 20 : 3,
                     transformOrigin: "center bottom",
+                    transformStyle: "preserve-3d",
                   }}
                   initial={false}
                   animate={
                     letterUp
-                      ? { x: "-50%", y: -145, opacity: 1, scale: 1.05 }
-                      : { x: "-50%", y: 55, opacity: 0, scale: 0.92 }
+                      ? {
+                          x: "-50%",
+                          y: -145,
+                          opacity: 1,
+                          scale: 1.05,
+                          rotateX: 0,
+                          scaleY: 1,
+                        }
+                      : {
+                          x: "-50%",
+                          y: 55,
+                          opacity: 0,
+                          scale: 0.92,
+                          rotateX: 62,
+                          scaleY: 0.55,
+                        }
                   }
                   transition={
                     reduceMotion
                       ? { duration: 0.01 }
-                      : luxuryTransition(TIMING.letterMs / 1000)
+                      : {
+                          ...luxuryTransition(TIMING.letterMs / 1000),
+                          rotateX: {
+                            duration: TIMING.letterMs / 1000,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
+                          scaleY: {
+                            duration: TIMING.letterMs / 1000,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
+                        }
                   }
                 >
                   <div className="relative aspect-[3/4] w-full drop-shadow-[0_16px_28px_rgba(0,0,0,0.4)]">
