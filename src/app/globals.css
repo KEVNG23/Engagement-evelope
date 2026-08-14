@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  --burgundy: #3d1418;
+  --burgundy-deep: #2a0c10;
+  --cream: #f4efe7;
+  --ivory: #fff8ef;
+  --champagne: #d4b98a;
+  --gold: #a88a64;
+  --ink: #4a1b24;
+  --background: var(--burgundy);
+  --foreground: var(--ivory);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-burgundy: var(--burgundy);
+  --color-cream: var(--cream);
+  --color-champagne: var(--champagne);
+  --color-gold: var(--gold);
+  --font-sans: var(--font-cormorant), "Times New Roman", serif;
+  --font-serif: var(--font-cormorant), "Times New Roman", serif;
+  --font-display: var(--font-bodoni), "Didot", "Times New Roman", serif;
+  --font-script: var(--font-allura), "Allura", cursive;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Never show a scrollbar — wheel / trackpad / touch still work */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+  width: 0;
+  height: 0;
+}
+
+/* Locked until envelope opens — no jump when content is taller than the viewport */
+html[data-scroll-lock="true"],
+html[data-scroll-lock="true"] body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  height: 100%;
+}
+
+html[data-scroll-lock="false"],
+html[data-scroll-lock="false"] body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+}
+
+body {
+  background: var(--burgundy);
+  color: var(--foreground);
+  font-family: var(--font-cormorant), "Times New Roman", serif;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-tap-highlight-color: transparent;
+  padding:
+    env(safe-area-inset-top, 0px)
+    env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px)
+    env(safe-area-inset-left, 0px);
+}
+
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.font-script {
+  font-family: var(--font-allura), "Allura", cursive !important;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.01em;
+}
+
+.font-serif {
+  font-family: var(--font-cormorant), "Times New Roman", serif;
+}
+
+.font-display {
+  font-family: var(--font-bodoni), "Didot", "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--champagne) 45%, transparent);
+  color: var(--ivory);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
