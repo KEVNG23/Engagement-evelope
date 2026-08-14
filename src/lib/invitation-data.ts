@@ -27,10 +27,9 @@ export const invitation = {
 export const EASE_LUXURY = [0.22, 1, 0.36, 1] as const;
 
 export const TIMING = {
-  flapMs: 450,
-  delayMs: 80,
-  letterMs: 700,
+  flapMs: 700,
+  delayMs: 180,
+  letterMs: 900,
   revealMs: 400,
-  /** Extra pause after letter rises before unlocking scroll */
-  holdMs: 180,
+  holdMs: 200,
 } as const;
