@@ -6,26 +6,20 @@ import { EnvelopeOpening } from "./EnvelopeOpening";
 import { FloatingParticles } from "./FloatingParticles";
 import { BackgroundSparkles } from "./BackgroundSparkles";
 import { InvitationDetails } from "./InvitationDetails";
-import { MusicToggle } from "./MusicToggle";
-import { playSoftPianoIntro } from "@/lib/softPiano";
 
 /**
  * Scroll lives on this container (not document), which is reliable on mobile /
  * Railway. Body/html scroll-lock was blocking touch scroll after open.
+ *
+ * Music is intentionally disabled for now — re-enable MusicToggle later.
  */
 export function InvitationExperience() {
   const reduceMotion = useReducedMotion();
   const [opened, setOpened] = useState(false);
-  const [musicOn, setMusicOn] = useState(false);
   const scrollerRef = useRef<HTMLElement>(null);
 
   const unlockScroll = useCallback(() => {
     setOpened(true);
-  }, []);
-
-  const handleOpenStart = useCallback(() => {
-    playSoftPianoIntro(0.16);
-    setMusicOn(true);
   }, []);
 
   // Clear any leftover document lock from older deploys / cached HTML
@@ -62,11 +56,7 @@ export function InvitationExperience() {
         <EnvelopeOpening
           opened={opened}
           onComplete={unlockScroll}
-          onSkip={() => {
-            handleOpenStart();
-            unlockScroll();
-          }}
-          onOpenStart={handleOpenStart}
+          onSkip={unlockScroll}
         />
 
         <motion.div
@@ -87,8 +77,6 @@ export function InvitationExperience() {
           {opened ? <InvitationDetails /> : null}
         </motion.div>
       </div>
-
-      <MusicToggle autoPlay={musicOn} />
     </main>
   );
 }
