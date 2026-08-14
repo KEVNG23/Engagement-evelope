@@ -96,11 +96,22 @@ export function EnvelopeOpening({
 
   return (
     <section className="relative flex min-h-[100svh] min-h-[100dvh] w-full flex-col items-center justify-center bg-[#3d1418] px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-5 sm:py-10">
-      {/* No local gradient — same solid burgundy as the rest of the page */}
-
-      <div className="relative z-10 mb-5 max-w-[22rem] text-center sm:mb-8 sm:max-w-none">
+      {/* Header fades away when open so the rising letter never covers the names */}
+      <motion.div
+        className={`relative z-10 max-w-[22rem] text-center sm:max-w-none ${
+          isOpen ? "mb-2 h-0 overflow-hidden pointer-events-none" : "mb-5 sm:mb-8"
+        }`}
+        initial={false}
+        animate={
+          isOpen
+            ? { opacity: 0, y: -20 }
+            : { opacity: 1, y: 0 }
+        }
+        transition={luxuryTransition(0.4)}
+        aria-hidden={isOpen}
+      >
         <p
-          className={`${displayFont.className} text-[9px] uppercase tracking-[0.28em] text-[#f3e8d5] xs:tracking-[0.36em] sm:text-[11px] sm:tracking-[0.42em]`}
+          className={`${displayFont.className} text-[9px] uppercase tracking-[0.28em] text-[#f3e8d5] sm:text-[11px] sm:tracking-[0.42em]`}
         >
           {invitation.inviteFrom}
         </p>
@@ -109,9 +120,12 @@ export function EnvelopeOpening({
         >
           Annie <span className="text-[0.9em]">&</span> Dũng
         </h1>
-      </div>
+      </motion.div>
 
-      <div className="relative z-20 w-full max-w-[440px]" style={{ perspective: "1200px" }}>
+      <div
+        className="relative z-20 w-full max-w-[440px]"
+        style={{ perspective: "1200px" }}
+      >
         <motion.button
           type="button"
           aria-labelledby={labelId}
@@ -239,15 +253,15 @@ export function EnvelopeOpening({
 
             <motion.div
               aria-hidden
-              className="absolute left-1/2 top-[8%] z-10 w-[42%] -translate-x-1/2"
+              className="absolute left-1/2 top-[12%] z-10 w-[38%] max-w-[9.5rem] -translate-x-1/2 sm:w-[42%] sm:max-w-none"
               style={{ transformStyle: "preserve-3d" }}
               initial={false}
               animate={
                 letterUp
-                  ? { y: -110, opacity: 1, scale: 1.04 }
+                  ? { y: -56, opacity: 1, scale: 1.02 }
                   : isOpen
-                    ? { y: -10, opacity: 1, scale: 0.98 }
-                    : { y: 48, opacity: 0, scale: 0.94 }
+                    ? { y: -8, opacity: 1, scale: 0.98 }
+                    : { y: 40, opacity: 0, scale: 0.94 }
               }
               transition={luxuryTransition(TIMING.letterMs / 1000)}
             >
