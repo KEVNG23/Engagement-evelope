@@ -17,8 +17,8 @@ type EnvelopeOpeningProps = {
 };
 
 /**
- * SAME envelope-closed.png the whole time.
- * No envelope-open.png. Lid lifts on the top hinge, then letter rises.
+ * Closed art while idle. Lid lifts from the same closed PNG, then the real
+ * open envelope art fades in so body + lid lace match (no blank cream sheet).
  */
 export function EnvelopeOpening({
   opened = false,
@@ -115,7 +115,6 @@ export function EnvelopeOpening({
   }
 
   const lidOpen = phase !== "idle";
-  const letterUp = phase === "risen" || phase === "done";
   const finished = phase === "done" || opened;
 
   return (
@@ -168,24 +167,26 @@ export function EnvelopeOpening({
           className="relative block w-full cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[#d4b98a]/70 disabled:cursor-default"
         >
           <div
-            className="relative aspect-[800/579] w-full"
-            style={{ perspective: "1100px", perspectiveOrigin: "50% 0%" }}
+            className="relative w-full transition-[aspect-ratio] duration-500"
+            style={{
+              aspectRatio: lidOpen ? "529 / 697" : "800 / 579",
+              perspective: "1100px",
+              perspectiveOrigin: "50% 0%",
+            }}
           >
             <div
               className="absolute inset-0"
               style={{ transformStyle: "preserve-3d" }}
             >
-              {/* Closed envelope — hide painted flap (tip sits ~83% down the PNG) */}
+              {/* Idle closed envelope */}
               <div
                 className="absolute inset-0"
                 style={{
                   zIndex: 1,
-                  WebkitMaskImage: lidOpen
-                    ? "linear-gradient(to bottom, transparent 0%, transparent 86%, #000 87%)"
-                    : "none",
-                  maskImage: lidOpen
-                    ? "linear-gradient(to bottom, transparent 0%, transparent 86%, #000 87%)"
-                    : "none",
+                  opacity: lidOpen ? 0 : 1,
+                  transition: reduceMotion
+                    ? "none"
+                    : `opacity ${Math.round(TIMING.flapMs * 0.35)}ms ease`,
                 }}
               >
                 <Image
@@ -199,98 +200,57 @@ export function EnvelopeOpening({
                 />
               </div>
 
-              {/* Pocket paper filling the masked flap area */}
-              <div
-                aria-hidden
-                className="absolute inset-x-[1%] top-[1%]"
-                style={{
-                  zIndex: 2,
-                  height: "86%",
-                  background:
-                    "linear-gradient(180deg, #f5ece2 0%, #efe3d3 55%, #ead6c1 100%)",
-                  opacity: lidOpen ? 1 : 0,
-                  transition: reduceMotion ? "none" : "opacity 70ms linear",
-                  boxShadow: "inset 0 12px 20px rgba(74,27,36,0.06)",
-                }}
-              />
-
-              {/* Letter rises after lid opens */}
-              <motion.div
-                className="absolute left-1/2 w-[44%]"
-                style={{
-                  top: "26%",
-                  zIndex: letterUp ? 28 : 4,
-                  transformOrigin: "center bottom",
-                }}
-                initial={false}
-                animate={
-                  letterUp
-                    ? { x: "-50%", y: -100, opacity: 1, scale: 1.03 }
-                    : { x: "-50%", y: 48, opacity: 0, scale: 0.9 }
-                }
-                transition={
-                  reduceMotion
-                    ? { duration: 0.01 }
-                    : luxuryTransition(TIMING.letterMs / 1000)
-                }
-              >
-                <div className="relative aspect-[3/4] w-full drop-shadow-[0_16px_28px_rgba(0,0,0,0.45)]">
-                  <Image
-                    src="/assets/lace-frame.png"
-                    alt=""
-                    fill
-                    draggable={false}
-                    sizes="170px"
-                    className="object-contain"
-                  />
-                  <div className="absolute inset-[17%] flex flex-col items-center justify-center px-1.5 text-center">
-                    <p className="font-serif text-[6px] tracking-[0.28em] text-[#6b4a32] sm:text-[7px]">
-                      {invitation.saveTheDate}
-                    </p>
-                    <p className="mt-0.5 font-serif text-[8px] tracking-[0.14em] text-[#3d1418] sm:text-[9px]">
-                      {invitation.title}
-                    </p>
-                    <p
-                      className={`${scriptFont.className} mt-1 text-sm leading-tight text-[#3d1418] sm:text-base`}
-                    >
-                      {invitation.bride}
-                    </p>
-                    <p className="my-0.5 font-serif text-[9px] text-[#3d1418]">
-                      &
-                    </p>
-                    <p
-                      className={`${scriptFont.className} text-sm leading-tight text-[#3d1418] sm:text-base`}
-                    >
-                      {invitation.groom}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-
               {/*
-                LID — lace flap from closed PNG only.
-                Parent owns perspective; only rotateX animates (clean mid frames).
+                Designed open envelope (cropped) — DT body + lace lid/sides
+                that match, not a blank cream rectangle.
               */}
               <div
-                className="absolute inset-x-[1%] top-[1%]"
+                className="absolute inset-0"
                 style={{
-                  zIndex: letterUp ? 6 : 16,
-                  height: "74%",
-                  transformOrigin: "50% 0%",
-                  transformStyle: "preserve-3d",
-                  transform: lidOpen ? "rotateX(-125deg)" : "rotateX(0deg)",
+                  zIndex: 2,
+                  opacity: lidOpen ? 1 : 0,
                   transition: reduceMotion
                     ? "none"
-                    : `transform ${TIMING.flapMs}ms cubic-bezier(0.22, 0.82, 0.2, 1)`,
+                    : `opacity ${TIMING.flapMs}ms cubic-bezier(0.22, 0.82, 0.2, 1)`,
+                }}
+              >
+                <Image
+                  src="/assets/envelope-opened-clean.png"
+                  alt=""
+                  fill
+                  priority
+                  draggable={false}
+                  sizes="340px"
+                  className="object-contain object-center drop-shadow-[0_22px_50px_rgba(0,0,0,0.5)]"
+                />
+              </div>
+
+              {/*
+                Lift lid from closed art during the open motion, then fade it
+                so the designed open lid (matching body lace) remains.
+              */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  zIndex: 16,
+                  transformOrigin: "50% 18%",
+                  transformStyle: "preserve-3d",
+                  transform: lidOpen ? "rotateX(-125deg)" : "rotateX(0deg)",
+                  opacity: phase === "opening" ? 1 : 0,
+                  transition: reduceMotion
+                    ? "none"
+                    : phase === "opening"
+                      ? `transform ${TIMING.flapMs}ms cubic-bezier(0.22, 0.82, 0.2, 1), opacity 40ms linear`
+                      : `transform ${TIMING.flapMs}ms cubic-bezier(0.22, 0.82, 0.2, 1), opacity 240ms ease`,
                   willChange: "transform",
+                  pointerEvents: "none",
                 }}
               >
                 <div
+                  className="absolute inset-0"
                   style={{
-                    position: "absolute",
-                    inset: 0,
-                    clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                    filter: "drop-shadow(0 14px 22px rgba(0,0,0,0.38))",
+                    clipPath: "polygon(8% 12%, 92% 12%, 50% 58%)",
+                    filter: "drop-shadow(0 14px 22px rgba(0,0,0,0.35))",
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -298,7 +258,7 @@ export function EnvelopeOpening({
                     src="/assets/envelope-closed.png"
                     alt=""
                     draggable={false}
-                    className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top"
+                    className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
                   />
                 </div>
               </div>
