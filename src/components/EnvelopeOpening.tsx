@@ -17,8 +17,12 @@ type EnvelopeOpeningProps = {
 };
 
 /**
- * Isolated 3D stage: parent float transforms must NOT wrap the lid,
- * or rotateX gets flattened and the flap never lifts.
+ * Matches the Canva open reference (ref-open-envelope):
+ * 1) Closed lace envelope
+ * 2) Flap folds back on the top hinge (scaleY + rotateX), revealing open art
+ * 3) Letter rises from the pocket
+ *
+ * Fake “second triangle” overlays were removed after live-site verification.
  */
 export function EnvelopeOpening({
   opened = false,
@@ -114,7 +118,7 @@ export function EnvelopeOpening({
     if (event.key === "Escape") handleSkip();
   }
 
-  const lidOpen = phase !== "idle";
+  const isOpen = phase !== "idle";
   const letterUp = phase === "risen" || phase === "done";
   const finished = phase === "done" || opened;
 
@@ -124,7 +128,7 @@ export function EnvelopeOpening({
         className="relative z-40 mb-3 max-w-[22rem] shrink-0 text-center sm:mb-5"
         initial={false}
         animate={
-          lidOpen
+          isOpen
             ? { opacity: 0, y: -10, scale: 0.8 }
             : { opacity: 1, y: 0, scale: 1 }
         }
@@ -142,18 +146,15 @@ export function EnvelopeOpening({
         </h1>
       </motion.div>
 
-      {/* Float wrapper — OUTSIDE the 3D stage so it cannot flatten rotateX */}
       <motion.div
         className="relative z-20 w-full max-w-[min(84vw,340px)] shrink-0"
         animate={
-          reduceMotion || lidOpen
-            ? { y: lidOpen ? 20 : 0 }
-            : {
-                y: hovered ? [-3, -9, -3] : [-4, -10, -4],
-              }
+          reduceMotion || isOpen
+            ? { y: isOpen ? 12 : 0 }
+            : { y: hovered ? [-3, -9, -3] : [-4, -10, -4] }
         }
         transition={
-          lidOpen
+          isOpen
             ? luxuryTransition(0.45)
             : { duration: 3.8, repeat: Infinity, ease: "easeInOut" }
         }
@@ -169,20 +170,20 @@ export function EnvelopeOpening({
           disabled={phase !== "idle"}
           className="relative block w-full cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[#d4b98a]/70 disabled:cursor-default"
         >
-          {/* 3D STAGE — perspective here, no animated transform on this node */}
-          <div
-            className="relative aspect-[800/579] w-full"
-            style={{
-              perspective: "1400px",
-              perspectiveOrigin: "50% 0%",
-            }}
+          <motion.div
+            className="relative mx-auto w-full"
+            initial={false}
+            animate={{ paddingTop: isOpen ? 64 : 0 }}
+            transition={luxuryTransition(TIMING.flapMs / 1000)}
           >
-            <div
-              className="absolute inset-0"
-              style={{ transformStyle: "preserve-3d" }}
-            >
-              {/* Closed envelope body */}
-              <div className="absolute inset-0" style={{ zIndex: 1 }}>
+            <div className="relative mx-auto aspect-[800/579] w-full">
+              {/* CLOSED */}
+              <motion.div
+                className="absolute inset-0 z-20"
+                initial={false}
+                animate={{ opacity: isOpen ? 0 : 1 }}
+                transition={{ duration: TIMING.flapMs / 1000, ease: [0.33, 1, 0.32, 1] }}
+              >
                 <Image
                   src="/assets/envelope-closed.png"
                   alt=""
@@ -192,40 +193,79 @@ export function EnvelopeOpening({
                   sizes="340px"
                   className="object-contain object-center drop-shadow-[0_22px_50px_rgba(0,0,0,0.5)]"
                 />
-              </div>
 
-              {/* Cover painted-on flap when lid opens */}
-              <div
-                aria-hidden
-                className="absolute inset-[3%]"
-                style={{
-                  zIndex: 2,
-                  clipPath: "polygon(0 0, 100% 0, 50% 80%)",
-                  background:
-                    "linear-gradient(180deg, #f0e5d6 0%, #e8d7c3 100%)",
-                  opacity: lidOpen ? 1 : 0,
-                  transition: "opacity 220ms ease-out",
-                }}
-              />
+                {/* Folding flap overlay — collapses toward the top hinge */}
+                <motion.div
+                  className="absolute inset-x-[1%] top-[1%] origin-top"
+                  style={{ height: "74%" }}
+                  initial={false}
+                  animate={
+                    isOpen
+                      ? { rotateX: -78, scaleY: 0.15, opacity: 0 }
+                      : { rotateX: 0, scaleY: 1, opacity: 1 }
+                  }
+                  transition={{
+                    duration: TIMING.flapMs / 1000,
+                    ease: [0.33, 1, 0.32, 1],
+                  }}
+                >
+                  <div
+                    className="h-full w-full"
+                    style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/assets/envelope-closed.png"
+                      alt=""
+                      draggable={false}
+                      className="pointer-events-none h-full w-full object-cover object-top"
+                    />
+                  </div>
+                </motion.div>
+              </motion.div>
 
-              {/* Letter */}
+              {/* OPEN — real Canva open envelope */}
               <motion.div
-                className="absolute left-1/2 w-[44%]"
-                style={{
-                  top: "22%",
-                  zIndex: letterUp ? 25 : 3,
-                  transformOrigin: "center bottom",
+                className="pointer-events-none absolute bottom-0 left-1/2 z-10 w-[82%] -translate-x-1/2"
+                style={{ aspectRatio: "635 / 799" }}
+                initial={false}
+                animate={{
+                  opacity: isOpen ? 1 : 0,
+                  filter: isOpen
+                    ? "drop-shadow(0 26px 48px rgba(0,0,0,0.45))"
+                    : "drop-shadow(0 16px 32px rgba(0,0,0,0.25))",
                 }}
+                transition={{ duration: TIMING.flapMs / 1000, ease: [0.33, 1, 0.32, 1] }}
+              >
+                <Image
+                  src="/assets/envelope-open.png"
+                  alt=""
+                  fill
+                  sizes="320px"
+                  className="object-contain object-bottom"
+                  priority
+                />
+              </motion.div>
+
+              {/* LETTER — rises from the open pocket */}
+              <motion.div
+                className="absolute left-1/2 w-[46%]"
+                style={{ bottom: "30%", transformOrigin: "center bottom" }}
                 initial={false}
                 animate={
                   letterUp
-                    ? { x: "-50%", y: -120, opacity: 1, scale: 1.04 }
-                    : { x: "-50%", y: 56, opacity: 0, scale: 0.9 }
+                    ? { x: "-50%", y: -120, opacity: 1, scale: 1.04, zIndex: 30 }
+                    : isOpen
+                      ? { x: "-50%", y: 20, opacity: 1, scale: 0.95, zIndex: 15 }
+                      : { x: "-50%", y: 36, opacity: 0, scale: 0.9, zIndex: 15 }
                 }
                 transition={
                   reduceMotion
                     ? { duration: 0.01 }
-                    : luxuryTransition(TIMING.letterMs / 1000)
+                    : {
+                        ...luxuryTransition(TIMING.letterMs / 1000),
+                        zIndex: { delay: letterUp ? 0.25 : 0, duration: 0 },
+                      }
                 }
               >
                 <div className="relative aspect-[3/4] w-full drop-shadow-[0_16px_28px_rgba(0,0,0,0.45)]">
@@ -261,71 +301,29 @@ export function EnvelopeOpening({
                 </div>
               </motion.div>
 
-              {/*
-                LID — CSS transform (not flattened by a parent Framer transform).
-                Hinged at top; lifts back so you see into the envelope.
-              */}
-              <div
-                className="absolute inset-x-[1%] top-[1%]"
+              {/* Front pocket so the letter comes out from inside */}
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute bottom-0 left-1/2 z-20 w-[82%] -translate-x-1/2"
                 style={{
-                  zIndex: 8,
-                  height: "76%",
-                  transformOrigin: "50% 0%",
-                  transformStyle: "preserve-3d",
-                  transform: lidOpen
-                    ? "perspective(1400px) rotateX(-155deg)"
-                    : "perspective(1400px) rotateX(0deg)",
-                  transition: reduceMotion
-                    ? "none"
-                    : `transform ${TIMING.flapMs}ms cubic-bezier(0.33, 1, 0.32, 1)`,
-                  willChange: "transform",
+                  aspectRatio: "635 / 799",
+                  clipPath:
+                    "polygon(0% 58%, 50% 78%, 100% 58%, 100% 100%, 0% 100%)",
                 }}
+                initial={false}
+                animate={{ opacity: isOpen ? 1 : 0 }}
+                transition={{ duration: TIMING.flapMs / 1000 }}
               >
-                {/* Front — lace flap */}
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                    backfaceVisibility: "hidden",
-                    WebkitBackfaceVisibility: "hidden",
-                    filter: "drop-shadow(0 16px 22px rgba(0,0,0,0.4))",
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/assets/envelope-closed.png"
-                    alt=""
-                    draggable={false}
-                    className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top"
-                  />
-                </div>
-
-                {/* Back — open lace underside (visible when flipped up) */}
-                <div
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                    transform: "rotateX(180deg)",
-                    backfaceVisibility: "hidden",
-                    WebkitBackfaceVisibility: "hidden",
-                    overflow: "hidden",
-                    background: "#efe4d4",
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/assets/envelope-open.png"
-                    alt=""
-                    draggable={false}
-                    className="pointer-events-none absolute left-1/2 top-0 h-full w-[120%] max-w-none -translate-x-1/2 object-cover object-top"
-                  />
-                </div>
-              </div>
+                <Image
+                  src="/assets/envelope-open.png"
+                  alt=""
+                  fill
+                  sizes="320px"
+                  className="object-contain object-bottom"
+                />
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </button>
       </motion.div>
 
