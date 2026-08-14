@@ -188,33 +188,18 @@ export function EnvelopeOpening({
                 />
               </div>
 
-              {/* Solid paper sheet covers the painted flap completely while open */}
+              {/* Paper covers painted flap — triangle only, not a full rectangle */}
               <div
                 aria-hidden
-                className="absolute inset-x-[4%] top-[4%]"
+                className="absolute inset-x-[2%] top-[2%]"
                 style={{
                   zIndex: 2,
-                  height: "70%",
-                  borderRadius: "2px",
-                  background:
-                    "linear-gradient(180deg, #f4ebe0 0%, #ebe0d0 50%, #e6d5c1 100%)",
-                  opacity: lidOpen ? 1 : 0,
-                  transition: "opacity 120ms linear",
-                }}
-              />
-
-              {/* Soft V mouth shadow so it still reads as an envelope opening */}
-              <div
-                aria-hidden
-                className="absolute inset-x-[8%] top-[8%]"
-                style={{
-                  zIndex: 3,
-                  height: "55%",
+                  height: "74%",
                   clipPath: "polygon(0 0, 100% 0, 50% 100%)",
                   background:
-                    "linear-gradient(180deg, rgba(74,27,36,0.06), transparent 70%)",
+                    "linear-gradient(180deg, #f4ebe0 0%, #ebe0d0 55%, #e6d5c1 100%)",
                   opacity: lidOpen ? 1 : 0,
-                  transition: "opacity 200ms ease-out",
+                  transition: "opacity 150ms linear",
                 }}
               />
 
