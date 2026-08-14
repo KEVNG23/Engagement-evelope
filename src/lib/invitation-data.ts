@@ -27,9 +27,9 @@ export const invitation = {
 export const EASE_LUXURY = [0.22, 1, 0.36, 1] as const;
 
 export const TIMING = {
-  flapMs: 700,
-  delayMs: 180,
-  letterMs: 900,
+  flapMs: 900,
+  delayMs: 200,
+  letterMs: 950,
   revealMs: 400,
-  holdMs: 200,
+  holdMs: 250,
 } as const;
