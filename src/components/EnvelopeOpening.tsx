@@ -121,15 +121,17 @@ export function EnvelopeOpening({
 
   return (
     <section className="relative flex min-h-[100svh] min-h-[100dvh] w-full flex-col items-center justify-center bg-[#3d1418] px-4 py-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-5">
+      {/* Names stay above the open lid */}
       <motion.div
-        className="relative z-10 mb-3 max-w-[22rem] shrink-0 text-center sm:mb-5 sm:max-w-none"
+        className="relative z-40 mb-3 max-w-[22rem] shrink-0 text-center sm:mb-5 sm:max-w-none"
         initial={false}
         animate={
-          letterUp
-            ? { opacity: 0.35, scale: 0.72, y: -6 }
+          lidOpen
+            ? { opacity: 0, scale: 0.7, y: -18, height: "auto" }
             : { opacity: 1, scale: 1, y: 0 }
         }
-        transition={luxuryTransition(0.5)}
+        transition={luxuryTransition(0.45)}
+        style={{ pointerEvents: lidOpen ? "none" : "auto" }}
       >
         <p
           className={`${displayFont.className} text-[9px] uppercase tracking-[0.28em] text-[#f3e8d5] sm:text-[11px] sm:tracking-[0.42em]`}
@@ -160,17 +162,23 @@ export function EnvelopeOpening({
             reduceMotion || phase !== "idle" ? undefined : { scale: 0.98 }
           }
           animate={
-            reduceMotion || phase !== "idle"
+            reduceMotion
               ? { y: 0, scale: 1 }
-              : {
-                  y: hovered ? [-3, -9, -3] : [-4, -10, -4],
-                  scale: hovered ? 1.03 : 1.01,
-                }
+              : phase === "idle"
+                ? {
+                    y: hovered ? [-3, -9, -3] : [-4, -10, -4],
+                    scale: hovered ? 1.03 : 1.01,
+                  }
+                : {
+                    // Pull envelope down slightly so open lid stays below the title area
+                    y: 12,
+                    scale: 0.94,
+                  }
           }
           transition={
             phase === "idle"
               ? { duration: 3.8, repeat: Infinity, ease: "easeInOut" }
-              : luxuryTransition(0.4)
+              : luxuryTransition(0.45)
           }
         >
           <AnimatePresence>
@@ -199,7 +207,7 @@ export function EnvelopeOpening({
           <motion.div
             className="relative mx-auto w-full"
             initial={false}
-            animate={{ paddingTop: lidOpen ? (letterUp ? 130 : 72) : 0 }}
+            animate={{ paddingTop: lidOpen ? (letterUp ? 88 : 56) : 0 }}
             transition={luxuryTransition(TIMING.flapMs / 1000)}
           >
             {/* 3D stage */}
@@ -253,7 +261,7 @@ export function EnvelopeOpening({
                     letterUp
                       ? {
                           x: "-50%",
-                          y: -145,
+                          y: -118,
                           opacity: 1,
                           scale: 1.05,
                           rotateX: 0,
@@ -342,13 +350,13 @@ export function EnvelopeOpening({
                   className="absolute inset-x-[0.5%] top-[0.5%]"
                   style={{
                     zIndex: 8,
-                    height: "82%",
+                    height: "68%",
                     transformStyle: "preserve-3d",
                     transformOrigin: "50% 0%",
                   }}
                   initial={false}
                   animate={{
-                    rotateX: lidOpen ? -170 : 0,
+                    rotateX: lidOpen ? -158 : 0,
                     transformPerspective: 1600,
                   }}
                   transition={
