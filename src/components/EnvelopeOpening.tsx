@@ -16,9 +16,10 @@ type EnvelopeOpeningProps = {
 };
 
 /**
- * Same closed envelope throughout — no swap to a different open image.
- * 1) Lid (flap) rotates open
- * 2) Letter rises from inside
+ * Same closed envelope the whole time:
+ * 1) Lid flips open
+ * 2) Letter slides up from inside
+ * No swap to a different open-envelope image.
  */
 export function EnvelopeOpening({
   opened = false,
@@ -98,7 +99,7 @@ export function EnvelopeOpening({
         initial={false}
         animate={
           letterUp
-            ? { opacity: 0.4, scale: 0.75, y: -10 }
+            ? { opacity: 0.35, scale: 0.72, y: -8 }
             : { opacity: 1, scale: 1, y: 0 }
         }
         transition={luxuryTransition(0.5)}
@@ -144,12 +145,12 @@ export function EnvelopeOpening({
                     scale: hovered ? 1.03 : 1.01,
                     rotateX: hovered ? 4 : 1,
                   }
-                : { y: 0, scale: 1, rotateX: 3 }
+                : { y: 0, scale: 1, rotateX: 2 }
           }
           transition={
             phase === "idle"
               ? { duration: 3.8, repeat: Infinity, ease: "easeInOut" }
-              : luxuryTransition(0.5)
+              : luxuryTransition(0.45)
           }
         >
           <AnimatePresence>
@@ -175,18 +176,17 @@ export function EnvelopeOpening({
             ) : null}
           </AnimatePresence>
 
-          {/* Extra top room only for the rising letter — envelope width never changes */}
           <motion.div
             className="relative w-full"
             initial={false}
-            animate={{ paddingTop: letterUp ? 120 : 0 }}
+            animate={{ paddingTop: letterUp ? 132 : 0 }}
             transition={luxuryTransition(TIMING.letterMs / 1000)}
           >
             <div
-              className="relative aspect-[800/579] w-full"
+              className="relative aspect-[800/579] w-full overflow-visible"
               style={{ transformStyle: "preserve-3d" }}
             >
-              {/* Base envelope — ALWAYS the same closed asset (no image swap / loading) */}
+              {/* Same closed envelope — always */}
               <div className="absolute inset-0 z-[1]">
                 <Image
                   src="/assets/envelope-closed.png"
@@ -199,41 +199,41 @@ export function EnvelopeOpening({
                 />
               </div>
 
-              {/*
-                Covers the flap drawn onto the PNG once the lid starts opening,
-                so we don’t see a “second closed flap” under the 3D lid.
-              */}
+              {/* Soft paper fill under the flipping lid (hides the flap drawn on the PNG) */}
               <motion.div
                 aria-hidden
-                className="absolute inset-0 z-[2]"
+                className="absolute inset-[4%] z-[2] rounded-sm"
                 style={{
-                  clipPath: "polygon(2% 2%, 98% 2%, 50% 82%)",
-                  background:
-                    "linear-gradient(180deg, #f7f1e8 0%, #efe6d8 55%, #e8dcc8 100%)",
+                  clipPath: "polygon(0 0, 100% 0, 50% 78%)",
+                  backgroundImage: "url(/assets/envelope-closed.png)",
+                  backgroundSize: "100% 100%",
+                  backgroundPosition: "center top",
+                  filter: "brightness(1.04)",
                 }}
                 initial={false}
                 animate={{ opacity: isOpen ? 1 : 0 }}
                 transition={{
-                  duration: TIMING.flapMs / 1000 * 0.35,
+                  duration: Math.max(0.15, TIMING.flapMs / 1000 * 0.25),
                   ease: "easeOut",
                 }}
               />
 
-              {/* Letter — starts hidden inside, then rises after the lid opens */}
+              {/* Letter — hidden until lid is open, then slides up from inside */}
               <motion.div
-                className="absolute left-1/2 top-[18%] z-[3] w-[46%] -translate-x-1/2"
-                style={{ transformStyle: "preserve-3d" }}
+                className="absolute left-1/2 z-[3] w-[45%] -translate-x-1/2"
+                style={{
+                  top: "22%",
+                  transformStyle: "preserve-3d",
+                }}
                 initial={false}
                 animate={
                   letterUp
-                    ? { y: -135, opacity: 1, scale: 1.06 }
-                    : isOpen
-                      ? { y: 12, opacity: 1, scale: 0.96 }
-                      : { y: 80, opacity: 0, scale: 0.9 }
+                    ? { y: -150, opacity: 1, scale: 1.05 }
+                    : { y: 70, opacity: 0, scale: 0.9 }
                 }
                 transition={luxuryTransition(TIMING.letterMs / 1000)}
               >
-                <div className="relative aspect-[3/4] w-full drop-shadow-[0_16px_28px_rgba(0,0,0,0.4)]">
+                <div className="relative aspect-[3/4] w-full drop-shadow-[0_18px_30px_rgba(0,0,0,0.42)]">
                   <Image
                     src="/assets/lace-frame.png"
                     alt=""
@@ -266,32 +266,15 @@ export function EnvelopeOpening({
                 </div>
               </motion.div>
 
-              {/* Front pocket edge — keeps letter looking tucked into the envelope */}
+              {/* Lid — flips open on the top edge */}
               <motion.div
-                aria-hidden
-                className="absolute inset-x-[6%] bottom-[8%] z-[4] h-[42%]"
-                style={{
-                  background:
-                    "linear-gradient(180deg, transparent 0%, rgba(245,240,232,0.15) 18%, #f3ebe0 40%, #ebe0d0 100%)",
-                  clipPath: "polygon(0 35%, 50% 0, 100% 35%, 100% 100%, 0 100%)",
-                }}
-                initial={false}
-                animate={{ opacity: isOpen ? 1 : 0 }}
-                transition={{
-                  duration: TIMING.flapMs / 1000 * 0.4,
-                  delay: isOpen ? TIMING.flapMs / 1000 * 0.15 : 0,
-                }}
-              />
-
-              {/* Lid — same envelope, flips open on the top hinge */}
-              <motion.div
-                className="absolute inset-x-[1%] top-[1%] z-[6] origin-top"
+                className="absolute inset-x-[1%] top-[1%] z-[5] origin-top will-change-transform"
                 style={{
                   transformStyle: "preserve-3d",
                   backfaceVisibility: "hidden",
                 }}
                 initial={false}
-                animate={{ rotateX: isOpen ? -180 : 0 }}
+                animate={{ rotateX: isOpen ? -175 : 0 }}
                 transition={luxuryTransition(TIMING.flapMs / 1000)}
               >
                 <div
