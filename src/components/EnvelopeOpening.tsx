@@ -16,10 +16,8 @@ type EnvelopeOpeningProps = {
 };
 
 /**
- * Same closed envelope the whole time:
- * 1) Lid flips open
- * 2) Letter slides up from inside
- * No swap to a different open-envelope image.
+ * Closed lace envelope → lid lifts (3D) → open envelope + letter rises from inside.
+ * Keeps burgundy theme and original Canva assets.
  */
 export function EnvelopeOpening({
   opened = false,
@@ -33,6 +31,7 @@ export function EnvelopeOpening({
   const phaseRef = useRef<EnvelopePhase>("idle");
   const completedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
+  const timersRef = useRef<number[]>([]);
 
   useEffect(() => {
     phaseRef.current = phase;
@@ -43,10 +42,21 @@ export function EnvelopeOpening({
   }, [onComplete]);
 
   useEffect(() => {
+    return () => {
+      timersRef.current.forEach((id) => window.clearTimeout(id));
+    };
+  }, []);
+
+  useEffect(() => {
     if (!opened) return;
     completedRef.current = true;
     if (phaseRef.current === "idle") setPhase("done");
   }, [opened]);
+
+  function clearTimers() {
+    timersRef.current.forEach((id) => window.clearTimeout(id));
+    timersRef.current = [];
+  }
 
   function openEnvelope() {
     if (phaseRef.current !== "idle" || completedRef.current) return;
@@ -58,23 +68,29 @@ export function EnvelopeOpening({
       return;
     }
 
+    clearTimers();
     setPhase("opening");
 
     const letterDelay = TIMING.flapMs + TIMING.delayMs;
 
-    window.setTimeout(() => {
-      if (phaseRef.current === "opening") setPhase("risen");
-    }, letterDelay);
+    timersRef.current.push(
+      window.setTimeout(() => {
+        if (phaseRef.current === "opening") setPhase("risen");
+      }, letterDelay),
+    );
 
-    window.setTimeout(() => {
-      if (completedRef.current) return;
-      completedRef.current = true;
-      setPhase("done");
-      onCompleteRef.current();
-    }, letterDelay + TIMING.letterMs + TIMING.holdMs);
+    timersRef.current.push(
+      window.setTimeout(() => {
+        if (completedRef.current) return;
+        completedRef.current = true;
+        setPhase("done");
+        onCompleteRef.current();
+      }, letterDelay + TIMING.letterMs + TIMING.holdMs),
+    );
   }
 
   function handleSkip() {
+    clearTimers();
     completedRef.current = true;
     setPhase("done");
     onSkip();
@@ -91,6 +107,8 @@ export function EnvelopeOpening({
   const isOpen = phase !== "idle";
   const letterUp = phase === "risen" || phase === "done";
   const finished = phase === "done" || opened;
+  /** Keep open look after skip / reduced-motion jump-to-done */
+  const showOpenArt = isOpen || finished;
 
   return (
     <section className="relative flex min-h-[100svh] min-h-[100dvh] w-full flex-col items-center justify-center bg-[#3d1418] px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-5 sm:py-10">
@@ -118,7 +136,7 @@ export function EnvelopeOpening({
 
       <div
         className="relative z-20 w-full max-w-[440px]"
-        style={{ perspective: "1500px" }}
+        style={{ perspective: "1600px" }}
       >
         <motion.button
           type="button"
@@ -176,112 +194,47 @@ export function EnvelopeOpening({
             ) : null}
           </AnimatePresence>
 
-          <motion.div
-            className="relative w-full"
-            initial={false}
-            animate={{ paddingTop: letterUp ? 132 : 0 }}
-            transition={luxuryTransition(TIMING.letterMs / 1000)}
-          >
-            <div
-              className="relative aspect-[800/579] w-full overflow-visible"
+          {/* Stage tall enough for open flap + rising letter */}
+          <div className="relative mx-auto aspect-[635/920] w-full max-w-[min(92vw,400px)]">
+            {/* Closed envelope */}
+            <motion.div
+              className="absolute inset-x-0 bottom-[14%] z-20 mx-auto aspect-[800/579] w-full"
               style={{ transformStyle: "preserve-3d" }}
+              initial={false}
+              animate={{ opacity: showOpenArt ? 0 : 1 }}
+              transition={luxuryTransition(TIMING.flapMs / 1000)}
             >
-              {/* Same closed envelope — always */}
-              <div className="absolute inset-0 z-[1]">
-                <Image
-                  src="/assets/envelope-closed.png"
-                  alt=""
-                  fill
-                  priority
-                  draggable={false}
-                  sizes="440px"
-                  className="object-contain object-center drop-shadow-[0_22px_55px_rgba(0,0,0,0.5)]"
-                />
-              </div>
-
-              {/* Soft paper fill under the flipping lid (hides the flap drawn on the PNG) */}
-              <motion.div
-                aria-hidden
-                className="absolute inset-[4%] z-[2] rounded-sm"
-                style={{
-                  clipPath: "polygon(0 0, 100% 0, 50% 78%)",
-                  backgroundImage: "url(/assets/envelope-closed.png)",
-                  backgroundSize: "100% 100%",
-                  backgroundPosition: "center top",
-                  filter: "brightness(1.04)",
-                }}
-                initial={false}
-                animate={{ opacity: isOpen ? 1 : 0 }}
-                transition={{
-                  duration: Math.max(0.15, TIMING.flapMs / 1000 * 0.25),
-                  ease: "easeOut",
-                }}
+              <Image
+                src="/assets/envelope-closed.png"
+                alt=""
+                fill
+                priority
+                draggable={false}
+                sizes="400px"
+                className="object-contain object-bottom drop-shadow-[0_22px_55px_rgba(0,0,0,0.5)]"
               />
 
-              {/* Letter — hidden until lid is open, then slides up from inside */}
+              {/* 3D lid lifts up */}
               <motion.div
-                className="absolute left-1/2 z-[3] w-[45%] -translate-x-1/2"
+                aria-hidden
+                className="pointer-events-none absolute inset-x-[1%] top-[1%] z-10 origin-top"
                 style={{
-                  top: "22%",
-                  transformStyle: "preserve-3d",
-                }}
-                initial={false}
-                animate={
-                  letterUp
-                    ? { y: -150, opacity: 1, scale: 1.05 }
-                    : { y: 70, opacity: 0, scale: 0.9 }
-                }
-                transition={luxuryTransition(TIMING.letterMs / 1000)}
-              >
-                <div className="relative aspect-[3/4] w-full drop-shadow-[0_18px_30px_rgba(0,0,0,0.42)]">
-                  <Image
-                    src="/assets/lace-frame.png"
-                    alt=""
-                    fill
-                    draggable={false}
-                    sizes="220px"
-                    className="object-contain"
-                  />
-                  <div className="absolute inset-[17%] flex flex-col items-center justify-center px-2 text-center">
-                    <p className="font-serif text-[7px] tracking-[0.28em] text-[#6b4a32] sm:text-[8px]">
-                      {invitation.saveTheDate}
-                    </p>
-                    <p className="mt-1 font-serif text-[9px] tracking-[0.16em] text-[#3d1418] sm:text-[10px]">
-                      {invitation.title}
-                    </p>
-                    <p
-                      className={`${scriptFont.className} mt-2 text-base leading-tight text-[#3d1418] sm:text-lg`}
-                    >
-                      {invitation.bride}
-                    </p>
-                    <p className="my-0.5 font-serif text-[10px] text-[#3d1418]">
-                      &
-                    </p>
-                    <p
-                      className={`${scriptFont.className} text-base leading-tight text-[#3d1418] sm:text-lg`}
-                    >
-                      {invitation.groom}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Lid — flips open on the top edge */}
-              <motion.div
-                className="absolute inset-x-[1%] top-[1%] z-[5] origin-top will-change-transform"
-                style={{
+                  height: "78%",
                   transformStyle: "preserve-3d",
                   backfaceVisibility: "hidden",
                 }}
                 initial={false}
-                animate={{ rotateX: isOpen ? -175 : 0 }}
+                animate={{
+                  rotateX: showOpenArt ? -168 : 0,
+                  opacity: showOpenArt ? 0 : 1,
+                }}
                 transition={luxuryTransition(TIMING.flapMs / 1000)}
               >
                 <div
-                  className="relative mx-auto aspect-[2/1] w-full overflow-hidden"
+                  className="relative h-full w-full overflow-hidden"
                   style={{
                     clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                    filter: "drop-shadow(0 10px 16px rgba(0,0,0,0.28))",
+                    filter: "drop-shadow(0 12px 18px rgba(0,0,0,0.35))",
                   }}
                 >
                   <Image
@@ -289,13 +242,117 @@ export function EnvelopeOpening({
                     alt=""
                     fill
                     draggable={false}
-                    sizes="440px"
+                    sizes="400px"
                     className="object-cover object-top"
                   />
                 </div>
               </motion.div>
-            </div>
-          </motion.div>
+            </motion.div>
+
+            {/* Open envelope back (full) */}
+            <motion.div
+              className="pointer-events-none absolute bottom-0 left-1/2 z-[11] w-[86%] -translate-x-1/2"
+              style={{ aspectRatio: "635 / 799" }}
+              initial={false}
+              animate={{
+                opacity: showOpenArt ? 1 : 0,
+                filter: showOpenArt
+                  ? "drop-shadow(0 28px 50px rgba(0,0,0,0.48))"
+                  : "drop-shadow(0 22px 55px rgba(0,0,0,0.35))",
+              }}
+              transition={luxuryTransition(TIMING.flapMs / 1000)}
+            >
+              <Image
+                src="/assets/envelope-open.png"
+                alt=""
+                fill
+                draggable={false}
+                sizes="400px"
+                className="object-contain object-bottom"
+                priority
+              />
+            </motion.div>
+
+            {/* LETTER — sits in pocket, then slides up and out */}
+            <motion.div
+              className="absolute left-1/2 w-[48%] will-change-transform"
+              style={{
+                bottom: "30%",
+                transformOrigin: "center bottom",
+              }}
+              initial={false}
+              animate={
+                letterUp
+                  ? { x: "-50%", y: -190, opacity: 1, scale: 1.05, zIndex: 28 }
+                  : showOpenArt
+                    ? { x: "-50%", y: 20, opacity: 1, scale: 0.94, zIndex: 18 }
+                    : { x: "-50%", y: 40, opacity: 0, scale: 0.9, zIndex: 18 }
+              }
+              transition={
+                reduceMotion
+                  ? { duration: 0.01 }
+                  : {
+                      ...luxuryTransition(TIMING.letterMs / 1000),
+                      zIndex: { delay: letterUp ? 0.35 : 0, duration: 0 },
+                    }
+              }
+            >
+              <div className="relative aspect-[3/4] w-full drop-shadow-[0_18px_30px_rgba(0,0,0,0.42)]">
+                <Image
+                  src="/assets/lace-frame.png"
+                  alt=""
+                  fill
+                  draggable={false}
+                  sizes="220px"
+                  className="object-contain"
+                />
+                <div className="absolute inset-[17%] flex flex-col items-center justify-center px-2 text-center">
+                  <p className="font-serif text-[7px] tracking-[0.28em] text-[#6b4a32] sm:text-[8px]">
+                    {invitation.saveTheDate}
+                  </p>
+                  <p className="mt-1 font-serif text-[9px] tracking-[0.16em] text-[#3d1418] sm:text-[10px]">
+                    {invitation.title}
+                  </p>
+                  <p
+                    className={`${scriptFont.className} mt-2 text-base leading-tight text-[#3d1418] sm:text-lg`}
+                  >
+                    {invitation.bride}
+                  </p>
+                  <p className="my-0.5 font-serif text-[10px] text-[#3d1418]">
+                    &
+                  </p>
+                  <p
+                    className={`${scriptFont.className} text-base leading-tight text-[#3d1418] sm:text-lg`}
+                  >
+                    {invitation.groom}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Front pocket flaps — letter slides out from under these */}
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 left-1/2 z-[22] w-[86%] -translate-x-1/2"
+              style={{
+                aspectRatio: "635 / 799",
+                clipPath:
+                  "polygon(0% 52%, 50% 72%, 100% 52%, 100% 100%, 0% 100%)",
+              }}
+              initial={false}
+              animate={{ opacity: showOpenArt ? 1 : 0 }}
+              transition={luxuryTransition(TIMING.flapMs / 1000)}
+            >
+              <Image
+                src="/assets/envelope-open.png"
+                alt=""
+                fill
+                draggable={false}
+                sizes="400px"
+                className="object-contain object-bottom"
+              />
+            </motion.div>
+          </div>
 
           <motion.div
             aria-hidden
