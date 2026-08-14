@@ -142,13 +142,13 @@ export function EnvelopeOpening({
         </h1>
       </motion.div>
 
-      {/* Float OUTSIDE 3D stage so it cannot flatten rotateX */}
+      {/* Float with marginTop — never transform — so lid perspective() stays true 3D */}
       <motion.div
         className="relative z-20 w-full max-w-[min(84vw,340px)] shrink-0"
         animate={
           reduceMotion || lidOpen
-            ? { y: lidOpen ? 20 : 0 }
-            : { y: hovered ? [-3, -9, -3] : [-4, -10, -4] }
+            ? { marginTop: lidOpen ? 20 : 0 }
+            : { marginTop: hovered ? [-3, -9, -3] : [-4, -10, -4] }
         }
         transition={
           lidOpen
@@ -169,14 +169,25 @@ export function EnvelopeOpening({
         >
           <div
             className="relative aspect-[800/579] w-full"
-            style={{ perspective: "1600px", perspectiveOrigin: "50% 0%" }}
+            style={{ perspective: "1100px", perspectiveOrigin: "50% 0%" }}
           >
             <div
               className="absolute inset-0"
               style={{ transformStyle: "preserve-3d" }}
             >
-              {/* Closed envelope — always full art underneath */}
-              <div className="absolute inset-0" style={{ zIndex: 1 }}>
+              {/* Closed envelope — hide painted flap (tip sits ~83% down the PNG) */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  zIndex: 1,
+                  WebkitMaskImage: lidOpen
+                    ? "linear-gradient(to bottom, transparent 0%, transparent 86%, #000 87%)"
+                    : "none",
+                  maskImage: lidOpen
+                    ? "linear-gradient(to bottom, transparent 0%, transparent 86%, #000 87%)"
+                    : "none",
+                }}
+              >
                 <Image
                   src="/assets/envelope-closed.png"
                   alt=""
@@ -188,18 +199,18 @@ export function EnvelopeOpening({
                 />
               </div>
 
-              {/* Paper covers painted flap — triangle only, not a full rectangle */}
+              {/* Pocket paper filling the masked flap area */}
               <div
                 aria-hidden
-                className="absolute inset-x-[2%] top-[2%]"
+                className="absolute inset-x-[1%] top-[1%]"
                 style={{
                   zIndex: 2,
-                  height: "74%",
-                  clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                  height: "86%",
                   background:
-                    "linear-gradient(180deg, #f4ebe0 0%, #ebe0d0 55%, #e6d5c1 100%)",
+                    "linear-gradient(180deg, #f5ece2 0%, #efe3d3 55%, #ead6c1 100%)",
                   opacity: lidOpen ? 1 : 0,
-                  transition: "opacity 150ms linear",
+                  transition: reduceMotion ? "none" : "opacity 70ms linear",
+                  boxShadow: "inset 0 12px 20px rgba(74,27,36,0.06)",
                 }}
               />
 
@@ -257,24 +268,21 @@ export function EnvelopeOpening({
               </motion.div>
 
               {/*
-                LID — same closed lace flap only.
-                Folds up into the top hinge (scaleY + slight rotateX) so the
-                lift is obviously visible (plain rotateX(-55) looked still closed).
+                LID — lace flap from closed PNG only.
+                Parent owns perspective; only rotateX animates (clean mid frames).
               */}
               <div
                 className="absolute inset-x-[1%] top-[1%]"
                 style={{
-                  zIndex: 16,
+                  zIndex: letterUp ? 6 : 16,
                   height: "74%",
                   transformOrigin: "50% 0%",
                   transformStyle: "preserve-3d",
-                  transform: lidOpen
-                    ? "rotateX(-55deg) scaleY(0.02)"
-                    : "rotateX(0deg) scaleY(1)",
-                  opacity: lidOpen ? 0 : 1,
+                  transform: lidOpen ? "rotateX(-125deg)" : "rotateX(0deg)",
                   transition: reduceMotion
                     ? "none"
-                    : `transform ${TIMING.flapMs}ms cubic-bezier(0.33, 1, 0.32, 1), opacity 350ms ${Math.round(TIMING.flapMs * 0.55)}ms ease`,
+                    : `transform ${TIMING.flapMs}ms cubic-bezier(0.22, 0.82, 0.2, 1)`,
+                  willChange: "transform",
                 }}
               >
                 <div
