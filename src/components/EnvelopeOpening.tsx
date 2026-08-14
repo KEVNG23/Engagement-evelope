@@ -175,7 +175,7 @@ export function EnvelopeOpening({
               className="absolute inset-0"
               style={{ transformStyle: "preserve-3d" }}
             >
-              {/* Always the same closed envelope */}
+              {/* Closed envelope — always full art underneath */}
               <div className="absolute inset-0" style={{ zIndex: 1 }}>
                 <Image
                   src="/assets/envelope-closed.png"
@@ -188,15 +188,31 @@ export function EnvelopeOpening({
                 />
               </div>
 
-              {/* Cover painted flap on the PNG when lid lifts (paper, not another image) */}
+              {/* Solid paper sheet covers the painted flap completely while open */}
               <div
                 aria-hidden
-                className="absolute inset-[2%]"
+                className="absolute inset-x-[4%] top-[4%]"
                 style={{
                   zIndex: 2,
-                  clipPath: "polygon(-2% -2%, 102% -2%, 50% 88%)",
+                  height: "70%",
+                  borderRadius: "2px",
                   background:
-                    "linear-gradient(180deg, #f4ebe0 0%, #ebe0d0 55%, #e5d4c0 100%)",
+                    "linear-gradient(180deg, #f4ebe0 0%, #ebe0d0 50%, #e6d5c1 100%)",
+                  opacity: lidOpen ? 1 : 0,
+                  transition: "opacity 120ms linear",
+                }}
+              />
+
+              {/* Soft V mouth shadow so it still reads as an envelope opening */}
+              <div
+                aria-hidden
+                className="absolute inset-x-[8%] top-[8%]"
+                style={{
+                  zIndex: 3,
+                  height: "55%",
+                  clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                  background:
+                    "linear-gradient(180deg, rgba(74,27,36,0.06), transparent 70%)",
                   opacity: lidOpen ? 1 : 0,
                   transition: "opacity 200ms ease-out",
                 }}
@@ -207,7 +223,7 @@ export function EnvelopeOpening({
                 className="absolute left-1/2 w-[44%]"
                 style={{
                   top: "26%",
-                  zIndex: letterUp ? 28 : 3,
+                  zIndex: letterUp ? 28 : 4,
                   transformOrigin: "center bottom",
                 }}
                 initial={false}
@@ -256,22 +272,24 @@ export function EnvelopeOpening({
               </motion.div>
 
               {/*
-                LID — same closed lace flap, hinged at top.
-                Modest lift so it stays attached (no floating second image).
+                LID — same closed lace flap only.
+                Folds up into the top hinge (scaleY + slight rotateX) so the
+                lift is obviously visible (plain rotateX(-55) looked still closed).
               */}
               <div
                 className="absolute inset-x-[1%] top-[1%]"
                 style={{
-                  zIndex: 14,
+                  zIndex: 16,
                   height: "74%",
                   transformOrigin: "50% 0%",
                   transformStyle: "preserve-3d",
                   transform: lidOpen
-                    ? "perspective(1600px) rotateX(-55deg)"
-                    : "perspective(1600px) rotateX(0deg)",
+                    ? "rotateX(-55deg) scaleY(0.02)"
+                    : "rotateX(0deg) scaleY(1)",
+                  opacity: lidOpen ? 0 : 1,
                   transition: reduceMotion
                     ? "none"
-                    : `transform ${TIMING.flapMs}ms cubic-bezier(0.33, 1, 0.32, 1)`,
+                    : `transform ${TIMING.flapMs}ms cubic-bezier(0.33, 1, 0.32, 1), opacity 350ms ${Math.round(TIMING.flapMs * 0.55)}ms ease`,
                 }}
               >
                 <div
