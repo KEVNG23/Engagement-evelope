@@ -59,18 +59,19 @@ export function EnvelopeOpening({
     setPhase("opening");
 
     const letterDelay = TIMING.flapMs + TIMING.delayMs;
-    const doneAt = letterDelay + TIMING.letterMs + TIMING.holdMs;
 
     window.setTimeout(() => {
       if (phaseRef.current === "opening") setPhase("risen");
     }, letterDelay);
 
+    // Unlock scroll as soon as the letter has risen — don't wait on an extra hold
+    // that left mobile users stuck behind document overflow:hidden.
     window.setTimeout(() => {
       if (completedRef.current) return;
       completedRef.current = true;
       setPhase("done");
       onCompleteRef.current();
-    }, doneAt);
+    }, letterDelay + TIMING.letterMs);
   }
 
   function handleSkip() {

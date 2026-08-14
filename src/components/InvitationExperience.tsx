@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { EnvelopeOpening } from "./EnvelopeOpening";
 import { FloatingParticles } from "./FloatingParticles";
@@ -8,28 +8,40 @@ import { InvitationDetails } from "./InvitationDetails";
 import { MusicToggle } from "./MusicToggle";
 
 /**
- * One continuous page — envelope stays mounted; details sit below from the start
- * so unlocking scroll never remounts / “refreshes” the layout.
+ * Scroll lives on this container (not document), which is reliable on mobile /
+ * Railway. Body/html scroll-lock was blocking touch scroll after open.
  */
 export function InvitationExperience() {
   const reduceMotion = useReducedMotion();
   const [opened, setOpened] = useState(false);
+  const scrollerRef = useRef<HTMLElement>(null);
 
   const unlockScroll = useCallback(() => {
     setOpened(true);
   }, []);
 
-  // Lock scroll until open. Keep scrollbar hidden so unlocking does not shift layout.
+  // Clear any leftover document lock from older deploys / cached HTML
   useEffect(() => {
     const root = document.documentElement;
-    root.dataset.scrollLock = opened ? "false" : "true";
-    return () => {
-      delete root.dataset.scrollLock;
-    };
-  }, [opened]);
+    root.removeAttribute("data-scroll-lock");
+    root.style.overflow = "";
+    root.style.height = "";
+    root.style.touchAction = "";
+    document.body.style.overflow = "";
+    document.body.style.height = "";
+    document.body.style.touchAction = "";
+  }, []);
 
   return (
-    <main className="relative min-h-[100svh] min-h-[100dvh] overflow-x-hidden bg-[#3d1418] text-[#f3e8d5]">
+    <main
+      ref={scrollerRef}
+      className={
+        opened
+          ? "relative h-[100dvh] w-full overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] text-[#f3e8d5] touch-pan-y"
+          : "relative h-[100dvh] w-full overflow-hidden bg-[#3d1418] text-[#f3e8d5] touch-none"
+      }
+      style={{ WebkitOverflowScrolling: "touch" }}
+    >
       <FloatingParticles density={16} />
 
       <div
@@ -44,21 +56,18 @@ export function InvitationExperience() {
           onSkip={unlockScroll}
         />
 
-        {/* Always in the tree (below the fold) — fade in gently when unlocked */}
         <motion.div
           aria-hidden={!opened}
           initial={false}
-          animate={{
-            opacity: opened ? 1 : 0.001,
-          }}
+          animate={{ opacity: opened ? 1 : 0 }}
           transition={
             reduceMotion
               ? { duration: 0 }
-              : { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+              : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }
           }
-          className={opened ? "pointer-events-auto" : "pointer-events-none"}
+          className={opened ? "pointer-events-auto" : "pointer-events-none h-0 overflow-hidden"}
         >
-          <InvitationDetails />
+          {opened ? <InvitationDetails /> : null}
         </motion.div>
       </div>
 

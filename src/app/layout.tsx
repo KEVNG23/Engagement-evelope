@@ -30,7 +30,6 @@ export default function RootLayout({
     <html
       lang="vi"
       className={`${serifFont.variable} ${displayFont.variable} ${scriptFont.variable} ${serifFont.className}`}
-      data-scroll-lock="true"
       suppressHydrationWarning
     >
       <body className="antialiased" suppressHydrationWarning>

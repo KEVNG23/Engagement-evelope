@@ -26,44 +26,28 @@
 }
 
 html {
+  height: 100%;
   scroll-behavior: smooth;
-  /* Never show a scrollbar — wheel / trackpad / touch still work */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge legacy */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overflow: hidden; /* scroll happens inside <main>, not the document */
 }
 
 html::-webkit-scrollbar {
-  display: none; /* Chrome / Safari */
+  display: none;
   width: 0;
   height: 0;
 }
 
-/* Locked until envelope opens — no jump when content is taller than the viewport */
-html[data-scroll-lock="true"],
-html[data-scroll-lock="true"] body {
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
-  height: 100%;
-}
-
-html[data-scroll-lock="false"],
-html[data-scroll-lock="false"] body {
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-  touch-action: pan-y;
-}
-
 body {
+  height: 100%;
+  margin: 0;
   background: var(--burgundy);
   color: var(--foreground);
   font-family: var(--font-cormorant), "Times New Roman", serif;
-  min-height: 100dvh;
-  min-height: 100svh;
-  overflow-x: hidden;
+  overflow: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
   -webkit-tap-highlight-color: transparent;
