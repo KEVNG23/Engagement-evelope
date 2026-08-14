@@ -189,19 +189,19 @@ export function EnvelopeOpening({
           <motion.div
             className="relative mx-auto w-full"
             initial={false}
-            animate={{ paddingTop: letterUp ? 120 : 0 }}
-            transition={luxuryTransition(TIMING.letterMs / 1000)}
+            animate={{ paddingTop: lidOpen ? (letterUp ? 130 : 72) : 0 }}
+            transition={luxuryTransition(TIMING.flapMs / 1000)}
           >
-            {/* 3D stage — perspective only here, not on the floating button */}
+            {/* 3D stage */}
             <div
               className="relative mx-auto aspect-[800/579] w-full"
-              style={{ perspective: "1200px", perspectiveOrigin: "50% 0%" }}
+              style={{ perspective: "1600px", perspectiveOrigin: "50% 0%" }}
             >
               <div
                 className="absolute inset-0"
                 style={{ transformStyle: "preserve-3d" }}
               >
-                {/* 1. Envelope body (always closed art) */}
+                {/* Envelope body */}
                 <div className="absolute inset-0" style={{ zIndex: 1 }}>
                   <Image
                     src="/assets/envelope-closed.png"
@@ -214,27 +214,27 @@ export function EnvelopeOpening({
                   />
                 </div>
 
-                {/* 2. Cover painted flap with paper once lid starts opening */}
+                {/* Hide the flap that is painted on the PNG once lid lifts */}
                 <motion.div
                   aria-hidden
-                  className="absolute inset-[4%]"
+                  className="absolute inset-[2%]"
                   style={{
                     zIndex: 2,
-                    clipPath: "polygon(0 0, 100% 0, 50% 78%)",
+                    clipPath: "polygon(-2% -2%, 102% -2%, 50% 86%)",
                     background:
-                      "linear-gradient(180deg, #f6eee2 0%, #efe2d1 45%, #e8d6c2 100%)",
+                      "linear-gradient(180deg, #f7f0e4 0%, #efe3d2 50%, #e9d8c4 100%)",
                   }}
                   initial={false}
                   animate={{ opacity: lidOpen ? 1 : 0 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                 />
 
-                {/* 3. Letter — hidden until lid is open, then rises */}
+                {/* Letter — only after lid is open */}
                 <motion.div
                   className="absolute left-1/2 w-[44%]"
                   style={{
                     top: "22%",
-                    zIndex: letterUp ? 25 : 3,
+                    zIndex: letterUp ? 20 : 3,
                     transformOrigin: "center bottom",
                   }}
                   initial={false}
@@ -282,7 +282,7 @@ export function EnvelopeOpening({
                   </div>
                 </motion.div>
 
-                {/* 4. Soft pocket edge after lid opens */}
+                {/* Pocket lip */}
                 <motion.div
                   aria-hidden
                   className="absolute inset-x-[10%] bottom-[10%] h-[38%]"
@@ -291,44 +291,48 @@ export function EnvelopeOpening({
                     clipPath:
                       "polygon(0 48%, 50% 100%, 100% 48%, 100% 100%, 0 100%)",
                     background:
-                      "linear-gradient(180deg, transparent, rgba(232,214,194,0.85))",
+                      "linear-gradient(180deg, transparent, rgba(232,214,194,0.9))",
                   }}
                   initial={false}
                   animate={{ opacity: lidOpen ? 1 : 0 }}
                   transition={{ duration: 0.35 }}
                 />
 
-                {/* 5. LID — lifts on top hinge */}
+                {/*
+                  LID — double-sided so it does NOT disappear after 90°.
+                  Front = lace flap. Back = cream underside.
+                  Opens to ~-170° and stays visible pointing UP.
+                */}
                 <motion.div
-                  className="absolute inset-x-[0.5%] top-[0.5%] origin-top"
+                  className="absolute inset-x-[0.5%] top-[0.5%]"
                   style={{
-                    zIndex: 6,
-                    height: "80%",
+                    zIndex: 8,
+                    height: "82%",
                     transformStyle: "preserve-3d",
                     transformOrigin: "50% 0%",
-                    backfaceVisibility: "hidden",
-                    WebkitBackfaceVisibility: "hidden",
                   }}
                   initial={false}
                   animate={{
-                    rotateX: lidOpen ? -160 : 0,
-                    // Framer applies perspective on the transforming element
-                    transformPerspective: 1400,
+                    rotateX: lidOpen ? -170 : 0,
+                    transformPerspective: 1600,
                   }}
                   transition={
                     reduceMotion
                       ? { duration: 0.01 }
                       : {
                           duration: TIMING.flapMs / 1000,
-                          ease: [0.22, 1, 0.36, 1],
+                          ease: [0.33, 1, 0.32, 1],
                         }
                   }
                 >
+                  {/* Front face (closed lace flap) */}
                   <div
-                    className="relative h-full w-full overflow-hidden"
+                    className="absolute inset-0 overflow-hidden"
                     style={{
                       clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                      filter: "drop-shadow(0 18px 24px rgba(0,0,0,0.4))",
+                      backfaceVisibility: "hidden",
+                      WebkitBackfaceVisibility: "hidden",
+                      filter: "drop-shadow(0 16px 22px rgba(0,0,0,0.45))",
                     }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -337,6 +341,27 @@ export function EnvelopeOpening({
                       alt=""
                       draggable={false}
                       className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top"
+                    />
+                  </div>
+
+                  {/* Back face — real open lace flap (visible when pointing UP) */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 overflow-hidden"
+                    style={{
+                      clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                      transform: "rotateX(180deg)",
+                      backfaceVisibility: "hidden",
+                      WebkitBackfaceVisibility: "hidden",
+                      filter: "drop-shadow(0 14px 22px rgba(0,0,0,0.35))",
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/assets/envelope-open.png"
+                      alt=""
+                      draggable={false}
+                      className="pointer-events-none absolute left-1/2 top-0 h-[130%] w-[118%] max-w-none -translate-x-1/2 object-cover object-top"
                     />
                   </div>
                 </motion.div>
