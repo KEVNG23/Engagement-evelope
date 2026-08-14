@@ -39,9 +39,7 @@ export function EnvelopeOpening({
   useEffect(() => {
     if (!opened) return;
     completedRef.current = true;
-    if (phaseRef.current === "idle") {
-      setPhase("done");
-    }
+    if (phaseRef.current === "idle") setPhase("done");
   }, [opened]);
 
   function openEnvelope() {
@@ -81,14 +79,14 @@ export function EnvelopeOpening({
       event.preventDefault();
       openEnvelope();
     }
-    if (event.key === "Escape") {
-      handleSkip();
-    }
+    if (event.key === "Escape") handleSkip();
   }
 
-  const isOpen = phase === "opening" || phase === "risen" || phase === "done";
+  const isOpen = phase !== "idle";
   const letterUp = phase === "risen" || phase === "done";
   const finished = phase === "done" || opened;
+  /** Show open art once the flap has swung past halfway */
+  const showOpenArt = isOpen;
 
   return (
     <section className="relative flex min-h-[100svh] min-h-[100dvh] w-full flex-col items-center justify-center bg-[#3d1418] px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-5 sm:py-10">
@@ -97,10 +95,10 @@ export function EnvelopeOpening({
         initial={false}
         animate={
           letterUp
-            ? { opacity: 1, scale: 0.78, y: -8 }
+            ? { opacity: 0.35, scale: 0.72, y: -12 }
             : { opacity: 1, scale: 1, y: 0 }
         }
-        transition={luxuryTransition(0.5)}
+        transition={luxuryTransition(0.55)}
       >
         <p
           className={`${displayFont.className} text-[9px] uppercase tracking-[0.28em] text-[#f3e8d5] sm:text-[11px] sm:tracking-[0.42em]`}
@@ -143,19 +141,19 @@ export function EnvelopeOpening({
                     scale: hovered ? 1.03 : 1.01,
                     rotateX: hovered ? 4 : 1,
                   }
-                : { y: 0, scale: 1, rotateX: 4 }
+                : { y: 0, scale: 1, rotateX: 2 }
           }
           transition={
             phase === "idle"
               ? { duration: 3.8, repeat: Infinity, ease: "easeInOut" }
-              : luxuryTransition(0.6)
+              : luxuryTransition(0.55)
           }
         >
           <AnimatePresence>
             {phase === "idle" && !reduceMotion ? (
               <motion.span
                 aria-hidden
-                className="pointer-events-none absolute inset-0 z-30 overflow-hidden"
+                className="pointer-events-none absolute inset-0 z-40 overflow-hidden"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -174,20 +172,32 @@ export function EnvelopeOpening({
             ) : null}
           </AnimatePresence>
 
-          {/* Extra top space so the letter can rise without clipping */}
+          {/* Room above for the rising letter — width stays constant */}
           <motion.div
-            className="pointer-events-none relative w-full"
+            className="relative w-full"
             initial={false}
-            animate={{ paddingTop: letterUp ? 96 : isOpen ? 36 : 0 }}
+            animate={{ paddingTop: letterUp ? 110 : isOpen ? 28 : 0 }}
             transition={luxuryTransition(TIMING.letterMs / 1000)}
           >
-            {/* Same closed size for the whole sequence — animate flap + letter */}
-            <div
-              className="relative aspect-[800/579] w-full"
+            <motion.div
+              className="relative w-full"
               style={{ transformStyle: "preserve-3d" }}
+              initial={false}
+              animate={{
+                aspectRatio: showOpenArt ? "635 / 760" : "800 / 579",
+              }}
+              transition={luxuryTransition(TIMING.flapMs / 1000)}
             >
-              {/* Envelope body — stays the closed asset (same size) */}
-              <div className="absolute inset-0 z-0">
+              {/* CLOSED art */}
+              <motion.div
+                className="absolute inset-0 z-[1]"
+                initial={false}
+                animate={{ opacity: showOpenArt ? 0 : 1 }}
+                transition={{
+                  duration: TIMING.flapMs / 1000,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
                 <Image
                   src="/assets/envelope-closed.png"
                   alt=""
@@ -195,33 +205,53 @@ export function EnvelopeOpening({
                   priority
                   draggable={false}
                   sizes="440px"
-                  className="pointer-events-none object-contain object-center drop-shadow-[0_22px_55px_rgba(0,0,0,0.5)]"
+                  className="object-contain object-center drop-shadow-[0_22px_55px_rgba(0,0,0,0.5)]"
                 />
-              </div>
+              </motion.div>
 
-              {/* Letter — rises after the flap opens */}
+              {/* OPEN art — fades in as the flap opens (replaces baked-in closed flap) */}
               <motion.div
-                aria-hidden
-                className="absolute left-1/2 top-[14%] z-[5] w-[46%] -translate-x-1/2"
+                className="absolute inset-0 z-[2]"
+                initial={false}
+                animate={{ opacity: showOpenArt ? 1 : 0 }}
+                transition={{
+                  duration: TIMING.flapMs / 1000,
+                  delay: showOpenArt ? TIMING.flapMs / 1000 / 3 : 0,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <Image
+                  src="/assets/envelope-open.png"
+                  alt=""
+                  fill
+                  draggable={false}
+                  sizes="440px"
+                  className="object-contain object-bottom drop-shadow-[0_22px_55px_rgba(0,0,0,0.5)]"
+                />
+              </motion.div>
+
+              {/* LETTER — hidden inside until flap opens, then rises */}
+              <motion.div
+                className="absolute left-1/2 top-[16%] z-[3] w-[48%] -translate-x-1/2"
                 style={{ transformStyle: "preserve-3d" }}
                 initial={false}
                 animate={
                   letterUp
-                    ? { y: -118, opacity: 1, scale: 1.06 }
+                    ? { y: -130, opacity: 1, scale: 1.08 }
                     : isOpen
-                      ? { y: -8, opacity: 1, scale: 0.98 }
-                      : { y: 64, opacity: 0, scale: 0.92 }
+                      ? { y: 8, opacity: 1, scale: 0.96 }
+                      : { y: 70, opacity: 0, scale: 0.9 }
                 }
                 transition={luxuryTransition(TIMING.letterMs / 1000)}
               >
-                <div className="relative aspect-[3/4] w-full drop-shadow-[0_18px_32px_rgba(0,0,0,0.4)]">
+                <div className="relative aspect-[3/4] w-full drop-shadow-[0_18px_32px_rgba(0,0,0,0.45)]">
                   <Image
                     src="/assets/lace-frame.png"
                     alt=""
                     fill
                     draggable={false}
-                    sizes="220px"
-                    className="pointer-events-none object-contain"
+                    sizes="240px"
+                    className="object-contain"
                   />
                   <div className="absolute inset-[17%] flex flex-col items-center justify-center px-2 text-center">
                     <p className="font-serif text-[7px] tracking-[0.28em] text-[#6b4a32] sm:text-[8px]">
@@ -247,22 +277,31 @@ export function EnvelopeOpening({
                 </div>
               </motion.div>
 
-              {/* Flap — rotates open (do not swap to a static open PNG) */}
+              {/* FLAP — 3D open animation on top of closed art */}
               <motion.div
-                className="absolute inset-x-[2%] top-[2%] z-20 origin-top"
+                className="absolute inset-x-[1%] top-[1%] z-[5] origin-top"
                 style={{
                   transformStyle: "preserve-3d",
                   backfaceVisibility: "hidden",
                 }}
                 initial={false}
-                animate={{ rotateX: isOpen ? -180 : 0 }}
-                transition={luxuryTransition(TIMING.flapMs / 1000)}
+                animate={{
+                  rotateX: isOpen ? -180 : 0,
+                  opacity: showOpenArt ? 0 : 1,
+                }}
+                transition={{
+                  rotateX: luxuryTransition(TIMING.flapMs / 1000),
+                  opacity: {
+                    duration: 0.2,
+                    delay: isOpen ? TIMING.flapMs / 1000 * 0.55 : 0,
+                  },
+                }}
               >
                 <div
                   className="relative mx-auto aspect-[2/1] w-full overflow-hidden"
                   style={{
                     clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                    filter: "drop-shadow(0 10px 18px rgba(0,0,0,0.28))",
+                    filter: "drop-shadow(0 12px 18px rgba(0,0,0,0.3))",
                   }}
                 >
                   <Image
@@ -271,11 +310,11 @@ export function EnvelopeOpening({
                     fill
                     draggable={false}
                     sizes="440px"
-                    className="pointer-events-none object-cover object-top"
+                    className="object-cover object-top"
                   />
                 </div>
               </motion.div>
-            </div>
+            </motion.div>
           </motion.div>
 
           <motion.div
@@ -290,7 +329,7 @@ export function EnvelopeOpening({
         </motion.button>
       </div>
 
-      <div className="relative z-10 mt-8 flex min-h-[4.5rem] flex-col items-center gap-2 text-center sm:mt-11">
+      <div className="relative z-10 mt-8 flex min-h-[4.5rem] flex-col items-center gap-2 text-center sm:mt-10">
         <AnimatePresence mode="wait">
           {phase === "idle" ? (
             <motion.div
