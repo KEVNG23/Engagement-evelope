@@ -50,8 +50,8 @@ export function InvitationExperience() {
       }
       style={{ WebkitOverflowScrolling: "touch" }}
     >
-      <BackgroundSparkles density={32} />
-      <FloatingParticles density={22} />
+      <BackgroundSparkles density={36} active />
+      <FloatingParticles density={24} active />
 
       <div
         aria-hidden

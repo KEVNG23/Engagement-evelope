@@ -39,7 +39,7 @@ export function BackgroundSparkles({
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-[1] overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-[1] overflow-hidden"
     >
       {sparkles.map((s) => (
         <motion.span
