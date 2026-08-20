@@ -81,27 +81,26 @@ export function InvitationDetails() {
           
           <div className="mx-auto mt-6 max-w-md space-y-4 text-left">
             <p className="font-serif text-sm leading-relaxed text-[#4a1b24]">
-              Sự hiện diện của Quý khách sẽ là niềm vinh hạnh và góp phần tạo nên những kỷ niệm đẹp trong ngày cưới của chúng tôi.
+              Sự hiện diện của Quý khách sẽ là niềm vinh hạnh và góp phần tạo nên những kỷ niệm đẹp trong ngày vui của chúng tôi.
             </p>
-            
+
             <p className="font-serif text-sm leading-relaxed text-[#4a1b24]">
-              Để chúng tôi có thể chuẩn bị chu đáo cho buổi tiệc, kính mong Quý khách vui lòng xác nhận tham dự trước ngày 30/12/2026 bằng cách điền thông tin bên dưới.
+              Để chúng tôi có thể chuẩn bị chu đáo cho buổi tiệc, kính mong Quý khách vui lòng xác nhận tham dự trước ngày 30/11/2026 bằng cách điền thông tin bên dưới.
             </p>
-            
+
             <p className="font-serif text-sm leading-relaxed text-[#4a1b24]">
               Xin chân thành cảm ơn và rất mong được đón tiếp Quý khách trong ngày vui của chúng tôi.
             </p>
           </div>
 
-          <div className="mx-auto mt-8 max-w-md">
+          <div className="mx-auto mt-8 w-full max-w-md overflow-hidden rounded-sm bg-[#f2eee9]">
             <iframe
-              src="https://docs.google.com/forms/d/e/1FAIpQLScmVoVainH-HX1EJ6qU80tdyNb8xehICB9muHP_okld417oBg/viewform?embedded=true"
+              title="Thiệp phúc đáp — Thanh Tuyền & Trí Dũng"
+              src="https://docs.google.com/forms/d/e/1FAIpQLSedJEnrA3OZJobiG4euB2bCMCdyYPafH4pWxZTSjJpiOJUIZA/viewform?embedded=true"
               width="100%"
-              height="1200"
-              frameBorder="0"
-              marginHeight={0}
-              marginWidth={0}
-              className="w-full"
+              height="1400"
+              loading="lazy"
+              className="w-full border-0 bg-transparent"
             >
               Đang tải…
             </iframe>

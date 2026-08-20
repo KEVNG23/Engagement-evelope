@@ -1,6 +1,6 @@
 # Lễ Đính Hôn — Animated Digital Invitation
 
-Premium envelope-reveal experience for **Annie & Dũng**, built from the existing Canva invitation design (burgundy + cream lace, original wording preserved).
+Premium envelope-reveal experience for **Thanh Tuyền (Annie) & Trí Dũng**, built from the existing Canva invitation design (burgundy + cream lace, original wording preserved).
 
 ## Stack
 

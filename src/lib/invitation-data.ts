@@ -1,8 +1,10 @@
 export const invitation = {
   coupleShort: "Annie & Dũng",
   bride: "Thanh Tuyền (Annie)",
+  /** Full formal name on the rising letter */
+  brideLetter: "Thị Thanh Tuyền",
   groom: "Trí Dũng",
-  monogram: { left: "D", right: "T" },
+  monogram: { left: "T", right: "D" },
   inviteFrom: "YOU'VE GOT INVITED FROM",
   saveTheDate: "SAVE THE DATE",
   title: "LỄ ĐÍNH HÔN",

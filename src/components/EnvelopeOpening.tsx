@@ -142,7 +142,7 @@ export function EnvelopeOpening({
         <h1
           className={`${scriptFont.className} mt-2 text-[clamp(2.4rem,11vw,4.75rem)] leading-[1.08] text-[#fff8ef]`}
         >
-          Dũng <span className="text-[0.9em]">&</span> Annie
+          Annie <span className="text-[0.9em]">&</span> Dũng
         </h1>
       </motion.div>
 
@@ -287,7 +287,7 @@ export function EnvelopeOpening({
                     <p
                       className={`${scriptFont.className} mt-1 text-base leading-tight text-[#3d1418] sm:text-lg`}
                     >
-                      {invitation.groom}
+                      {invitation.brideLetter}
                     </p>
                     <p className="my-0.5 font-serif text-[10px] text-[#3d1418]">
                       &
@@ -295,7 +295,7 @@ export function EnvelopeOpening({
                     <p
                       className={`${scriptFont.className} text-base leading-tight text-[#3d1418] sm:text-lg`}
                     >
-                      {invitation.bride}
+                      {invitation.groom}
                     </p>
                   </div>
                 </div>
