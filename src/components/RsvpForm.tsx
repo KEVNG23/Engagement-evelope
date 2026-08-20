@@ -4,18 +4,6 @@ import Image from "next/image";
 import { FormEvent, useMemo, useState } from "react";
 import { displayFont } from "@/lib/fonts";
 
-const GOOGLE_FORM_ACTION =
-  "https://docs.google.com/forms/d/e/1FAIpQLSedJEnrA3OZJobiG4euB2bCMCdyYPafH4pWxZTSjJpiOJUIZA/formResponse";
-
-const ENTRIES = {
-  name: "entry.877086558",
-  guestGroup: "entry.1498135098",
-  guestGroupOther: "entry.1498135098.other_option_response",
-  attend: "entry.1424661284",
-  allergy: "entry.220707796",
-  vegetarian: "entry.806366388",
-} as const;
-
 const GUEST_GROUPS = [
   "Người nhà",
   "Bạn của ba mẹ cô dâu",
@@ -28,11 +16,11 @@ const ATTEND_OPTIONS = [
   "Rất tiếc, tôi không thể tham dự",
 ] as const;
 
-type Status = "idle" | "submitting" | "success" | "error";
+type Status = "idle" | "submitting" | "success" | "error" | "signin";
 
 /**
  * Native RSVP form styled like wedding.einvitation.blog,
- * submitting into the engagement Google Form responses sheet.
+ * submitting into the engagement Google Form via /api/rsvp.
  */
 export function RsvpForm() {
   const [name, setName] = useState("");
@@ -56,25 +44,35 @@ export function RsvpForm() {
 
     setStatus("submitting");
 
-    const body = new URLSearchParams();
-    body.set(ENTRIES.name, name.trim());
-    if (guestGroup === "Other") {
-      body.set(ENTRIES.guestGroup, "__other_option__");
-      body.set(ENTRIES.guestGroupOther, guestGroupOther.trim());
-    } else {
-      body.set(ENTRIES.guestGroup, guestGroup);
-    }
-    body.set(ENTRIES.attend, attend);
-    body.set(ENTRIES.allergy, allergy.trim());
-    body.set(ENTRIES.vegetarian, vegetarian);
-
     try {
-      await fetch(GOOGLE_FORM_ACTION, {
+      const response = await fetch("/api/rsvp", {
         method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          guestGroup,
+          guestGroupOther: guestGroupOther.trim(),
+          attend,
+          allergy: allergy.trim(),
+          vegetarian,
+        }),
       });
+
+      const data = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        message?: string;
+      } | null;
+
+      if (!response.ok || !data?.ok) {
+        if (data?.error === "form_requires_sign_in") {
+          setStatus("signin");
+        } else {
+          setStatus("error");
+        }
+        return;
+      }
+
       setStatus("success");
       setName("");
       setGuestGroup("");
@@ -264,6 +262,15 @@ export function RsvpForm() {
                   ))}
                 </div>
               </div>
+
+              {status === "signin" ? (
+                <p className="text-center font-serif text-sm leading-relaxed text-[#f0b8a8]">
+                  Google Form đang yêu cầu đăng nhập Google nên phản hồi chưa
+                  được ghi nhận. Mở form → Settings → tắt &quot;Restrict to
+                  users…&quot; và &quot;Limit to 1 response&quot;, rồi thử gửi
+                  lại.
+                </p>
+              ) : null}
 
               {status === "error" ? (
                 <p className="text-center font-serif text-sm text-[#f0b8a8]">
