@@ -5,15 +5,25 @@ import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { displayFont } from "@/lib/fonts";
 import { rsvpValueMap, useLocale } from "@/lib/i18n";
+import {
+  RSVP_TOKEN_STORAGE_KEY,
+  clearStoredRsvpToken,
+  getStoredRsvpToken,
+} from "@/lib/rsvp-client";
 
-const STORAGE_KEY = "engagement-rsvp-token";
-
-type Status = "idle" | "submitting" | "success" | "error" | "already";
+type Status =
+  | "idle"
+  | "checking"
+  | "submitting"
+  | "success"
+  | "error"
+  | "already"
+  | "missing";
 
 /**
  * Native RSVP form with private view link (option 3).
  * One browser keeps the token in localStorage; the link works on any device.
- * UI can be English; stored / Google Form values stay Vietnamese.
+ * If the saved response was deleted, unlock the browser so the guest can submit again.
  */
 export function RsvpForm() {
   const { t } = useLocale();
@@ -29,12 +39,46 @@ export function RsvpForm() {
   const [shareUrl, setShareUrl] = useState("");
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved && /^[a-f0-9]{32}$/i.test(saved)) {
-      setToken(saved);
-      setStatus("already");
-      setShareUrl(`${window.location.origin}/rsvp/${saved}`);
-    }
+    const saved = getStoredRsvpToken();
+    if (!saved) return;
+
+    let cancelled = false;
+    setStatus("checking");
+    setToken(saved);
+    setShareUrl(`${window.location.origin}/rsvp/${saved}`);
+
+    (async () => {
+      try {
+        const response = await fetch(`/api/rsvp/${saved}`, {
+          method: "GET",
+          cache: "no-store",
+        });
+
+        if (cancelled) return;
+
+        if (response.ok) {
+          setStatus("already");
+          return;
+        }
+
+        if (response.status === 404) {
+          clearStoredRsvpToken(saved);
+          setToken(null);
+          setShareUrl("");
+          setStatus("missing");
+          return;
+        }
+
+        // Network/server blip — keep the link, don't unlock yet
+        setStatus("already");
+      } catch {
+        if (!cancelled) setStatus("already");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -43,7 +87,13 @@ export function RsvpForm() {
   }, [token]);
 
   const canSubmit = useMemo(() => {
-    if (status === "already" || status === "success") return false;
+    if (
+      status === "already" ||
+      status === "success" ||
+      status === "checking" ||
+      status === "missing"
+    )
+      return false;
     if (!name.trim() || !guestGroup || !attend || !allergy.trim() || !vegetarian)
       return false;
     if (guestGroup === "Other" && !guestGroupOther.trim()) return false;
@@ -57,6 +107,13 @@ export function RsvpForm() {
     vegetarian,
     status,
   ]);
+
+  function unlockForm() {
+    clearStoredRsvpToken(token);
+    setToken(null);
+    setShareUrl("");
+    setStatus("idle");
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -89,7 +146,7 @@ export function RsvpForm() {
         return;
       }
 
-      window.localStorage.setItem(STORAGE_KEY, data.token);
+      window.localStorage.setItem(RSVP_TOKEN_STORAGE_KEY, data.token);
       setToken(data.token);
       setStatus("success");
       setName("");
@@ -160,6 +217,32 @@ export function RsvpForm() {
     </div>
   );
 
+  const missingCard = (
+    <div className="rounded-sm border border-[#e0c9a8]/40 bg-[#5a2730]/50 px-5 py-8 text-center">
+      <p className="font-serif text-[1.05rem] text-[#f7ecd9]">
+        {t("rsvpMissingTitle")}
+      </p>
+      <p className="mt-4 font-serif text-sm leading-relaxed text-[#d4b89a]">
+        {t("rsvpMissingBody")}
+      </p>
+      <button
+        type="button"
+        onClick={unlockForm}
+        className="mt-6 bg-[#e0c9a8] px-5 py-3 font-serif text-sm uppercase tracking-[0.14em] text-[#3d1418] transition-opacity hover:opacity-90"
+      >
+        {t("rsvpMissingCta")}
+      </button>
+    </div>
+  );
+
+  const checkingCard = (
+    <div className="rounded-sm border border-[#e0c9a8]/25 bg-[#5a2730]/40 px-5 py-8 text-center">
+      <p className="font-serif text-sm tracking-[0.08em] text-[#d4b89a]">
+        {t("rsvpChecking")}
+      </p>
+    </div>
+  );
+
   return (
     <section id="rsvp" className="bg-[#3d1418]">
       <div className="relative h-[38svh] min-h-[220px] w-full overflow-hidden">
@@ -194,7 +277,11 @@ export function RsvpForm() {
             {t("rsvpIntro3")}
           </p>
 
-          {status === "success" || status === "already" ? (
+          {status === "checking" ? (
+            checkingCard
+          ) : status === "missing" ? (
+            missingCard
+          ) : status === "success" || status === "already" ? (
             doneCard
           ) : (
             <form className="mt-2 space-y-7" onSubmit={onSubmit}>

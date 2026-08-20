@@ -55,6 +55,11 @@ const messages = {
     rsvpError: "Không gửi được. Vui lòng thử lại.",
     rsvpThanks: "Cảm ơn Quý khách đã gửi phúc đáp!",
     rsvpAlready: "Quý khách đã gửi phúc đáp trên thiết bị này.",
+    rsvpChecking: "Đang kiểm tra phúc đáp…",
+    rsvpMissingTitle: "Không tìm thấy phúc đáp",
+    rsvpMissingBody:
+      "Rất tiếc, chúng tôi không tìm thấy phúc đáp gắn với link này. Có thể phúc đáp đã bị xoá nhầm hoặc link không còn hiệu lực. Quý khách vui lòng điền lại form để gửi phúc đáp mới — thiết bị này đã được mở lại để Quý khách gửi được.",
+    rsvpMissingCta: "Điền lại phúc đáp",
     rsvpSaveLink:
       "Lưu link riêng bên dưới để xem lại câu trả lời bất kỳ lúc nào — không cần đăng nhập.",
     rsvpView: "Xem phúc đáp",
@@ -121,6 +126,11 @@ const messages = {
     rsvpError: "Could not submit. Please try again.",
     rsvpThanks: "Thank you for your RSVP!",
     rsvpAlready: "You have already submitted an RSVP on this device.",
+    rsvpChecking: "Checking your RSVP…",
+    rsvpMissingTitle: "We couldn't find your RSVP",
+    rsvpMissingBody:
+      "Sorry — this private link no longer matches a saved response. It may have been removed by mistake, or the link is no longer valid. You're welcome to fill in the form again; we've unlocked this browser so you can submit a new RSVP.",
+    rsvpMissingCta: "Submit again",
     rsvpSaveLink:
       "Save the private link below to view your answers anytime — no login needed.",
     rsvpView: "View RSVP",
