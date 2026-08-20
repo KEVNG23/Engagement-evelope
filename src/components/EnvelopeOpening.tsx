@@ -35,6 +35,7 @@ export function EnvelopeOpening({
   const { t, locale } = useLocale();
   const labelId = useId();
   const [phase, setPhase] = useState<EnvelopePhase>("idle");
+  const [closedReady, setClosedReady] = useState(false);
   const phaseRef = useRef<EnvelopePhase>("idle");
   const completedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
@@ -64,6 +65,19 @@ export function EnvelopeOpening({
     completedRef.current = true;
     if (phaseRef.current === "idle") setPhase("done");
   }, [opened]);
+
+  // Handle cached closed envelope (onLoad may not re-fire)
+  useEffect(() => {
+    const img = new window.Image();
+    img.src = "/assets/envelope-closed.webp";
+    if (img.complete) {
+      setClosedReady(true);
+      return;
+    }
+    const markReady = () => setClosedReady(true);
+    img.addEventListener("load", markReady);
+    return () => img.removeEventListener("load", markReady);
+  }, []);
 
   function clearTimers() {
     timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -160,7 +174,7 @@ export function EnvelopeOpening({
           aria-describedby={phase === "idle" ? `${labelId}-hint` : undefined}
           onClick={openEnvelope}
           onKeyDown={onKeyDown}
-          disabled={phase !== "idle"}
+          disabled={phase !== "idle" || !closedReady}
           className="relative block w-full cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[#d4b98a]/70 disabled:cursor-default"
         >
           <motion.div
@@ -170,34 +184,38 @@ export function EnvelopeOpening({
             transition={luxuryTransition(TIMING.flapMs / 1000)}
           >
             <div className="relative mx-auto aspect-[800/579] w-full">
-              {/* CLOSED */}
+              {/* CLOSED — wait for full art so the triangular lid never flashes alone */}
               <motion.div
                 className="absolute inset-0 z-20"
                 initial={false}
-                animate={{ opacity: isOpen ? 0 : 1 }}
-                transition={{ duration: TIMING.flapMs / 1000, ease: [0.33, 1, 0.32, 1] }}
+                animate={{
+                  opacity: !closedReady ? 0 : isOpen ? 0 : 1,
+                }}
+                transition={{
+                  duration: !closedReady ? 0 : TIMING.flapMs / 1000,
+                  ease: [0.33, 1, 0.32, 1],
+                }}
               >
                 <Image
                   src="/assets/envelope-closed.webp"
                   alt=""
                   fill
                   priority
-                  quality={80}
+                  unoptimized
                   draggable={false}
                   sizes="340px"
+                  onLoad={() => setClosedReady(true)}
                   className="envelope-shadow object-contain object-center"
                 />
+              </motion.div>
 
-                {/* Folding flap overlay — collapses toward the top hinge */}
+              {/* Flap only while opening — idle already shows the complete closed envelope */}
+              {phase !== "idle" ? (
                 <motion.div
-                  className="absolute inset-x-[1%] top-[1%] origin-top [transform-style:preserve-3d]"
+                  className="absolute inset-x-[1%] top-[1%] z-30 origin-top [transform-style:preserve-3d]"
                   style={{ height: "74%", perspective: 800 }}
-                  initial={false}
-                  animate={
-                    isOpen
-                      ? { rotateX: -78, scaleY: 0.15, opacity: 0 }
-                      : { rotateX: 0, scaleY: 1, opacity: 1 }
-                  }
+                  initial={{ rotateX: 0, scaleY: 1, opacity: 1 }}
+                  animate={{ rotateX: -78, scaleY: 0.15, opacity: 0 }}
                   transition={{
                     duration: TIMING.flapMs / 1000,
                     ease: [0.33, 1, 0.32, 1],
@@ -212,14 +230,15 @@ export function EnvelopeOpening({
                       src="/assets/envelope-closed.webp"
                       alt=""
                       draggable={false}
-                      decoding="async"
+                      decoding="sync"
+                      fetchPriority="high"
                       className="pointer-events-none h-full w-full object-cover object-top"
                     />
                   </div>
                 </motion.div>
-              </motion.div>
+              ) : null}
 
-              {/* OPEN — real Canva open envelope */}
+              {/* OPEN — defer so it does not race the closed image on first paint */}
               <motion.div
                 className="envelope-open-shadow pointer-events-none absolute bottom-0 left-1/2 z-10 w-[82%] -translate-x-1/2"
                 style={{ aspectRatio: "635 / 799" }}
@@ -231,8 +250,7 @@ export function EnvelopeOpening({
                   src="/assets/envelope-open.webp"
                   alt=""
                   fill
-                  priority
-                  quality={80}
+                  unoptimized
                   sizes="320px"
                   className="object-contain object-bottom"
                 />
@@ -288,7 +306,6 @@ export function EnvelopeOpening({
                       src="/assets/lace-frame.webp"
                       alt=""
                       fill
-                      priority
                       unoptimized
                       draggable={false}
                       sizes="200px"
@@ -336,7 +353,7 @@ export function EnvelopeOpening({
                   src="/assets/envelope-open.webp"
                   alt=""
                   fill
-                  quality={80}
+                  unoptimized
                   sizes="320px"
                   className="object-contain object-bottom"
                 />
