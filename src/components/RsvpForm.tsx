@@ -164,10 +164,11 @@ export function RsvpForm() {
     <section id="rsvp" className="bg-[#3d1418]">
       <div className="relative h-[38svh] min-h-[220px] w-full overflow-hidden">
         <Image
-          src="/assets/peony.png"
+          src="/assets/peony.webp"
           alt=""
           fill
           sizes="100vw"
+          quality={75}
           className="object-cover object-center opacity-80"
         />
         <div className="absolute inset-0 bg-[rgba(53,18,24,0.55)]" />

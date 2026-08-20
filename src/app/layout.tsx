@@ -32,6 +32,27 @@ export default function RootLayout({
       className={`${serifFont.variable} ${displayFont.variable} ${scriptFont.variable} ${serifFont.className}`}
       suppressHydrationWarning
     >
+      <head>
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/envelope-closed.webp"
+          type="image/webp"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/envelope-open.webp"
+          type="image/webp"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/lace-frame.webp"
+          type="image/webp"
+        />
+      </head>
       <body className="antialiased" suppressHydrationWarning>
         {children}
       </body>

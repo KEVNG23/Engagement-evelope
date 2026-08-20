@@ -35,7 +35,6 @@ export function EnvelopeOpening({
   const { t, locale } = useLocale();
   const labelId = useId();
   const [phase, setPhase] = useState<EnvelopePhase>("idle");
-  const [hovered, setHovered] = useState(false);
   const phaseRef = useRef<EnvelopePhase>("idle");
   const completedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
@@ -149,17 +148,11 @@ export function EnvelopeOpening({
       </motion.div>
 
       <motion.div
-        className="relative z-20 w-full max-w-[min(84vw,340px)] shrink-0"
-        animate={
-          reduceMotion || isOpen
-            ? { y: isOpen ? 12 : 0 }
-            : { y: hovered ? [-3, -9, -3] : [-4, -10, -4] }
-        }
-        transition={
-          isOpen
-            ? luxuryTransition(0.45)
-            : { duration: 3.8, repeat: Infinity, ease: "easeInOut" }
-        }
+        className={`relative z-20 w-full max-w-[min(84vw,340px)] shrink-0 ${
+          !reduceMotion && !isOpen ? "invite-float" : ""
+        }`}
+        animate={isOpen ? { y: 12 } : { y: 0 }}
+        transition={luxuryTransition(0.45)}
       >
         <button
           type="button"
@@ -167,8 +160,6 @@ export function EnvelopeOpening({
           aria-describedby={phase === "idle" ? `${labelId}-hint` : undefined}
           onClick={openEnvelope}
           onKeyDown={onKeyDown}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
           disabled={phase !== "idle"}
           className="relative block w-full cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[#d4b98a]/70 disabled:cursor-default"
         >
@@ -187,19 +178,20 @@ export function EnvelopeOpening({
                 transition={{ duration: TIMING.flapMs / 1000, ease: [0.33, 1, 0.32, 1] }}
               >
                 <Image
-                  src="/assets/envelope-closed.png"
+                  src="/assets/envelope-closed.webp"
                   alt=""
                   fill
                   priority
+                  quality={80}
                   draggable={false}
                   sizes="340px"
-                  className="object-contain object-center drop-shadow-[0_22px_50px_rgba(0,0,0,0.5)]"
+                  className="envelope-shadow object-contain object-center"
                 />
 
                 {/* Folding flap overlay — collapses toward the top hinge */}
                 <motion.div
-                  className="absolute inset-x-[1%] top-[1%] origin-top"
-                  style={{ height: "74%" }}
+                  className="absolute inset-x-[1%] top-[1%] origin-top [transform-style:preserve-3d]"
+                  style={{ height: "74%", perspective: 800 }}
                   initial={false}
                   animate={
                     isOpen
@@ -212,14 +204,15 @@ export function EnvelopeOpening({
                   }}
                 >
                   <div
-                    className="h-full w-full"
+                    className="relative h-full w-full overflow-hidden"
                     style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="/assets/envelope-closed.png"
+                      src="/assets/envelope-closed.webp"
                       alt=""
                       draggable={false}
+                      decoding="async"
                       className="pointer-events-none h-full w-full object-cover object-top"
                     />
                   </div>
@@ -228,24 +221,20 @@ export function EnvelopeOpening({
 
               {/* OPEN — real Canva open envelope */}
               <motion.div
-                className="pointer-events-none absolute bottom-0 left-1/2 z-10 w-[82%] -translate-x-1/2"
+                className="envelope-open-shadow pointer-events-none absolute bottom-0 left-1/2 z-10 w-[82%] -translate-x-1/2"
                 style={{ aspectRatio: "635 / 799" }}
                 initial={false}
-                animate={{
-                  opacity: isOpen ? 1 : 0,
-                  filter: isOpen
-                    ? "drop-shadow(0 26px 48px rgba(0,0,0,0.45))"
-                    : "drop-shadow(0 16px 32px rgba(0,0,0,0.25))",
-                }}
+                animate={{ opacity: isOpen ? 1 : 0 }}
                 transition={{ duration: TIMING.flapMs / 1000, ease: [0.33, 1, 0.32, 1] }}
               >
                 <Image
-                  src="/assets/envelope-open.png"
+                  src="/assets/envelope-open.webp"
                   alt=""
                   fill
+                  priority
+                  quality={80}
                   sizes="320px"
                   className="object-contain object-bottom"
-                  priority
                 />
               </motion.div>
 
@@ -270,15 +259,17 @@ export function EnvelopeOpening({
                       }
                 }
               >
-                <div className="relative aspect-[3/4] w-full drop-shadow-[0_16px_28px_rgba(0,0,0,0.45)]">
+                <div className="relative aspect-[3/4] w-full shadow-[0_16px_28px_rgba(0,0,0,0.45)]">
                   <div
                     aria-hidden
                     className="absolute inset-[12%] rounded-[50%] bg-[#faf1da]"
                   />
                   <Image
-                    src="/assets/lace-frame.png"
+                    src="/assets/lace-frame.webp"
                     alt=""
                     fill
+                    priority
+                    quality={75}
                     draggable={false}
                     sizes="200px"
                     className="object-contain"
@@ -321,9 +312,10 @@ export function EnvelopeOpening({
                 transition={{ duration: TIMING.flapMs / 1000 }}
               >
                 <Image
-                  src="/assets/envelope-open.png"
+                  src="/assets/envelope-open.webp"
                   alt=""
                   fill
+                  quality={80}
                   sizes="320px"
                   className="object-contain object-bottom"
                 />

@@ -101,9 +101,86 @@ body::-webkit-scrollbar {
   color: var(--ivory);
 }
 
+/* GPU-friendly ambient motion (replaces dozens of Framer loops) */
+@keyframes invite-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+@keyframes invite-sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  40% {
+    opacity: 0.85;
+    transform: scale(1.15);
+  }
+  70% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes invite-fall {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), 115vh, 0);
+    opacity: 0;
+  }
+}
+
+.invite-float {
+  animation: invite-float 3.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.invite-sparkle {
+  animation-name: invite-sparkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: opacity, transform;
+}
+
+.invite-particle {
+  animation-name: invite-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+.envelope-shadow {
+  filter: drop-shadow(0 22px 50px rgba(0, 0, 0, 0.5));
+}
+
+.envelope-open-shadow {
+  filter: drop-shadow(0 26px 48px rgba(0, 0, 0, 0.45));
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .invite-float,
+  .invite-sparkle,
+  .invite-particle {
+    animation: none !important;
   }
 
   *,

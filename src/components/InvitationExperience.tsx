@@ -18,6 +18,7 @@ import { LanguageToggle } from "./LanguageToggle";
 export function InvitationExperience() {
   const reduceMotion = useReducedMotion();
   const [opened, setOpened] = useState(false);
+  const [fxReady, setFxReady] = useState(false);
   const scrollerRef = useRef<HTMLElement>(null);
 
   const unlockScroll = useCallback(() => {
@@ -36,6 +37,31 @@ export function InvitationExperience() {
     document.body.style.touchAction = "";
   }, []);
 
+  // Let the envelope + fonts paint first; then enable ambient FX
+  useEffect(() => {
+    if (reduceMotion) return;
+
+    let cancelled = false;
+    const enable = () => {
+      if (!cancelled) setFxReady(true);
+    };
+
+    const idle =
+      typeof window !== "undefined" && "requestIdleCallback" in window
+        ? window.requestIdleCallback(enable, { timeout: 900 })
+        : null;
+    const timeout =
+      idle === null ? window.setTimeout(enable, 450) : null;
+
+    return () => {
+      cancelled = true;
+      if (idle !== null && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idle);
+      }
+      if (timeout !== null) window.clearTimeout(timeout);
+    };
+  }, [reduceMotion]);
+
   return (
     <LocaleProvider>
       <main
@@ -48,8 +74,12 @@ export function InvitationExperience() {
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         <LanguageToggle />
-        <BackgroundSparkles density={36} active />
-        <FloatingParticles density={24} active />
+        {fxReady ? (
+          <>
+            <BackgroundSparkles density={14} active />
+            <FloatingParticles density={10} active />
+          </>
+        ) : null}
 
         <div
           aria-hidden

@@ -88,9 +88,9 @@ const messages = {
     opening: "Opening invitation…",
     scrollDetails: "Scroll down for details",
     saveTheDate: "SAVE THE DATE",
-    title: "THE BRIDE'S RESIDENCE",
+    title: "ENGAGEMENT CEREMONY",
     ceremonyLine: "Engagement ceremony at 9:00 AM",
-    venueLabel: "AT THE FAMILY HOME",
+    venueLabel: "THE BRIDE'S RESIDENCE",
     address:
       "616 Le Duc Anh, Binh Hung Hoa B Ward, Binh Tan Dist., Ho Chi Minh City",
     addressOld:
