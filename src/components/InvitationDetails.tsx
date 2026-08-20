@@ -2,6 +2,7 @@
 
 import { invitation } from "@/lib/invitation-data";
 import { RevealSection } from "./RevealSection";
+import { RsvpForm } from "./RsvpForm";
 
 /**
  * Cream stationery card on the same burgundy page background as the envelope —
@@ -73,40 +74,9 @@ export function InvitationDetails() {
         </RevealSection>
       </section>
 
-      <RevealSection className="mx-auto mt-8 w-full max-w-lg px-4 sm:mt-10 sm:max-w-xl sm:px-6">
-        <div className="border border-[#fff8ef]/90 bg-[#f2eee9] px-5 py-9 sm:px-8 sm:py-10">
-          <h3 className="text-center font-serif text-base tracking-[0.3em] text-[#a88a64]">
-            RSVP
-          </h3>
-          
-          <div className="mx-auto mt-6 max-w-md space-y-4 text-left">
-            <p className="font-serif text-sm leading-relaxed text-[#4a1b24]">
-              Sự hiện diện của Quý khách sẽ là niềm vinh hạnh và góp phần tạo nên những kỷ niệm đẹp trong ngày vui của chúng tôi.
-            </p>
-
-            <p className="font-serif text-sm leading-relaxed text-[#4a1b24]">
-              Để chúng tôi có thể chuẩn bị chu đáo cho buổi tiệc, kính mong Quý khách vui lòng xác nhận tham dự trước ngày 30/11/2026 bằng cách điền thông tin bên dưới.
-            </p>
-
-            <p className="font-serif text-sm leading-relaxed text-[#4a1b24]">
-              Xin chân thành cảm ơn và rất mong được đón tiếp Quý khách trong ngày vui của chúng tôi.
-            </p>
-          </div>
-
-          <div className="mx-auto mt-8 w-full max-w-md overflow-hidden rounded-sm bg-[#f2eee9]">
-            <iframe
-              title="Thiệp phúc đáp — Thanh Tuyền & Trí Dũng"
-              src="https://docs.google.com/forms/d/e/1FAIpQLSedJEnrA3OZJobiG4euB2bCMCdyYPafH4pWxZTSjJpiOJUIZA/viewform?embedded=true"
-              width="100%"
-              height="1400"
-              loading="lazy"
-              className="w-full border-0 bg-transparent"
-            >
-              Đang tải…
-            </iframe>
-          </div>
-        </div>
-      </RevealSection>
+      <div className="mt-10 sm:mt-14">
+        <RsvpForm />
+      </div>
     </div>
   );
 }
