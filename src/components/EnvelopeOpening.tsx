@@ -142,7 +142,7 @@ export function EnvelopeOpening({
         <h1
           className={`${scriptFont.className} mt-2 text-[clamp(2.4rem,11vw,4.75rem)] leading-[1.08] text-[#fff8ef]`}
         >
-          Annie <span className="text-[0.9em]">&</span> Dũng
+          Dũng <span className="text-[0.9em]">&</span> Annie
         </h1>
       </motion.div>
 
