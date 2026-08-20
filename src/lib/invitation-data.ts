@@ -26,6 +26,13 @@ export const invitation = {
   skipLabel: "Bỏ qua hoạt ảnh",
 } as const;
 
+/** Wedding day — save-the-date only (formal invitation will follow). */
+export const wedding = {
+  day: "17",
+  year: "2027",
+  doubleHappiness: "囍",
+} as const;
+
 export const EASE_LUXURY = [0.22, 1, 0.36, 1] as const;
 
 export const TIMING = {

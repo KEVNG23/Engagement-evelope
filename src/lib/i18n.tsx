@@ -35,6 +35,20 @@ const messages = {
     lunar: "(Nhằm ngày 25 tháng 11 2026 Âm Lịch)",
     footer: "Save the date and celebrate this special moment with us",
     detailsAria: "Chi tiết lễ đính hôn",
+    weddingEyebrow: "SAVE THE DATE",
+    weddingTitle: "LỄ THÀNH HÔN",
+    weddingLine: "Dự kiến cử hành lúc 09:00 sáng",
+    weddingVenueLabel: "ĐỊA ĐIỂM",
+    weddingVenue: "Sẽ được thông báo sau",
+    weddingNote:
+      "Đây là lời lưu ngày — thiệp mời chính thức sẽ được gửi đến Quý khách trong thời gian tới.",
+    weddingWeekday: "Chủ Nhật",
+    weddingTimeOfDay: "lúc 9 sáng",
+    weddingMonth: "THÁNG 1",
+    weddingLunar: "(Nhằm ngày 10 tháng 12 2026 Âm Lịch)",
+    weddingFooter:
+      "Kindly save the date — a formal wedding invitation will follow",
+    weddingAria: "Lưu ngày lễ thành hôn",
     rsvpTitle: "THIỆP PHÚC ĐÁP",
     rsvpIntro1:
       "Sự hiện diện của Quý khách sẽ là niềm vinh hạnh và góp phần tạo nên những kỷ niệm đẹp trong ngày vui của chúng tôi.",
@@ -106,6 +120,20 @@ const messages = {
     lunar: "(Lunar calendar: 25 November 2026)",
     footer: "Save the date and celebrate this special moment with us",
     detailsAria: "Engagement ceremony details",
+    weddingEyebrow: "SAVE THE DATE",
+    weddingTitle: "WEDDING DAY",
+    weddingLine: "Ceremony planned for 9:00 AM",
+    weddingVenueLabel: "VENUE",
+    weddingVenue: "To be announced",
+    weddingNote:
+      "This is a save-the-date only — a formal wedding invitation will be sent to you later.",
+    weddingWeekday: "Sunday",
+    weddingTimeOfDay: "at 9 AM",
+    weddingMonth: "JANUARY",
+    weddingLunar: "(Lunar calendar: 10 December 2026)",
+    weddingFooter:
+      "Kindly save the date — a formal wedding invitation will follow",
+    weddingAria: "Wedding day save the date",
     rsvpTitle: "RSVP",
     rsvpIntro1:
       "Your presence would be our greatest honour and would help make this day unforgettable.",
