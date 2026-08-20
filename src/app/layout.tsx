@@ -5,7 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Lễ Đính Hôn — Annie & Dũng",
   description:
-    "Thiệp mời lễ đính hôn của Thanh Tuyền (Annie) & Trí Dũng — 17.01.2027",
+    "Thiệp mời lễ đính hôn của Thanh Tuyền (Annie) & Trí Dũng — 02.01.2027",
   openGraph: {
     title: "Lễ Đính Hôn — Annie & Dũng",
     description: "Nhấn để mở thiệp mời lễ đính hôn",
