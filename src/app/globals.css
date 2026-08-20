@@ -128,6 +128,45 @@ body::-webkit-scrollbar {
   }
 }
 
+@keyframes invite-dust {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  35% {
+    opacity: var(--dust-peak, 0.14);
+    transform: scale(1);
+  }
+  55% {
+    opacity: calc(var(--dust-peak, 0.14) * 0.35);
+    transform: scale(0.85);
+  }
+  75% {
+    opacity: calc(var(--dust-peak, 0.14) * 0.7);
+    transform: scale(1.05);
+  }
+}
+
+.invite-float {
+  animation: invite-float 3.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.invite-sparkle {
+  animation-name: invite-sparkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: opacity, transform;
+}
+
+.invite-dust {
+  animation-name: invite-dust;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: opacity, transform;
+}
+
 @keyframes invite-fall {
   0% {
     transform: translate3d(0, 0, 0);
@@ -209,6 +248,7 @@ body::-webkit-scrollbar {
 
   .invite-float,
   .invite-sparkle,
+  .invite-dust,
   .invite-particle,
   .invite-petal {
     animation: none !important;

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { LocaleProvider } from "@/lib/i18n";
 import { EnvelopeOpening } from "./EnvelopeOpening";
-import { FloatingPetals } from "./FloatingPetals";
+import { BackgroundSparkles } from "./BackgroundSparkles";
 import { InvitationDetails } from "./InvitationDetails";
 import { LanguageToggle } from "./LanguageToggle";
 
@@ -73,7 +73,7 @@ export function InvitationExperience() {
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         <LanguageToggle />
-        {fxReady ? <FloatingPetals count={6} active /> : null}
+        {fxReady ? <BackgroundSparkles density={16} active /> : null}
 
         <div
           aria-hidden
