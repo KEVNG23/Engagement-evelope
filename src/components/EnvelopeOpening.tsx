@@ -279,61 +279,58 @@ export function EnvelopeOpening({
                       }
                 }
               >
+                {/*
+                  No CSS filter/drop-shadow here — filters rasterize to a rectangle
+                  during Framer scale/y transforms and show as a card “box”.
+                */}
                 <div
-                  className="relative w-full"
+                  className="relative aspect-[580/800] w-full overflow-hidden"
                   style={{
-                    filter: "drop-shadow(0 14px 22px rgba(0, 0, 0, 0.42))",
+                    WebkitMaskImage: "url(/assets/lace-frame.webp)",
+                    maskImage: "url(/assets/lace-frame.webp)",
+                    WebkitMaskSize: "100% 100%",
+                    maskSize: "100% 100%",
+                    WebkitMaskRepeat: "no-repeat",
+                    maskRepeat: "no-repeat",
+                    WebkitMaskPosition: "center",
+                    maskPosition: "center",
+                    // Hard oval clip — survives Framer scale/y (filters do not)
+                    borderRadius: "50%",
+                    boxShadow: "0 16px 26px rgba(0,0,0,0.3)",
                   }}
                 >
                   <div
-                    className="relative aspect-[3/4] w-full"
-                    style={{
-                      // Clip everything to the lace silhouette — no rectangular card
-                      WebkitMaskImage: "url(/assets/lace-frame.webp)",
-                      maskImage: "url(/assets/lace-frame.webp)",
-                      WebkitMaskSize: "contain",
-                      maskSize: "contain",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskRepeat: "no-repeat",
-                      WebkitMaskPosition: "center",
-                      maskPosition: "center",
-                    }}
-                  >
-                    <div
-                      aria-hidden
-                      className="absolute inset-[15%] rounded-[50%] bg-[#faf1da]"
-                    />
-                    {/* unoptimized keeps lace alpha intact (no rectangular bake-in) */}
-                    <Image
-                      src="/assets/lace-frame.webp"
-                      alt=""
-                      fill
-                      unoptimized
-                      draggable={false}
-                      sizes="200px"
-                      className="object-contain"
-                    />
-                    <div className="absolute inset-[18%] flex flex-col items-center justify-center px-1.5 text-center">
-                      <p className="font-serif text-[7px] tracking-[0.28em] text-[#6b4a32] sm:text-[8px]">
-                        {t("saveTheDate")}
-                      </p>
-                      <p className="mt-0.5 font-serif text-[9px] tracking-[0.14em] text-[#3d1418] sm:text-[10px]">
-                        {t("title")}
-                      </p>
-                      <p
-                        className={`${scriptFont.className} mt-1 text-base leading-tight text-[#3d1418] sm:text-lg`}
-                      >
-                        {invitation.brideLetter}
-                      </p>
-                      <p className="my-0.5 font-serif text-[10px] text-[#3d1418]">
-                        &
-                      </p>
-                      <p
-                        className={`${scriptFont.className} text-base leading-tight text-[#3d1418] sm:text-lg`}
-                      >
-                        {invitation.groom}
-                      </p>
-                    </div>
+                    aria-hidden
+                    className="absolute inset-[16%] rounded-[50%] bg-[#faf1da]"
+                  />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/assets/lace-frame.webp"
+                    alt=""
+                    draggable={false}
+                    decoding="async"
+                    className="pointer-events-none absolute inset-0 h-full w-full object-fill"
+                  />
+                  <div className="absolute inset-[18%] flex flex-col items-center justify-center px-1.5 text-center">
+                    <p className="font-serif text-[7px] tracking-[0.28em] text-[#6b4a32] sm:text-[8px]">
+                      {t("saveTheDate")}
+                    </p>
+                    <p className="mt-0.5 font-serif text-[9px] tracking-[0.14em] text-[#3d1418] sm:text-[10px]">
+                      {t("title")}
+                    </p>
+                    <p
+                      className={`${scriptFont.className} mt-1 text-base leading-tight text-[#3d1418] sm:text-lg`}
+                    >
+                      {invitation.brideLetter}
+                    </p>
+                    <p className="my-0.5 font-serif text-[10px] text-[#3d1418]">
+                      &
+                    </p>
+                    <p
+                      className={`${scriptFont.className} text-base leading-tight text-[#3d1418] sm:text-lg`}
+                    >
+                      {invitation.groom}
+                    </p>
                   </div>
                 </div>
               </motion.div>
