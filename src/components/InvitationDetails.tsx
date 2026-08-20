@@ -74,19 +74,143 @@ export function InvitationDetails() {
       </section>
 
       <RevealSection className="mx-auto mt-8 w-full max-w-lg px-4 sm:mt-10 sm:max-w-xl sm:px-6">
-        <div className="border border-[#fff8ef]/90 bg-[#f2eee9] px-5 py-9 text-center sm:px-6 sm:py-10">
-          <h3 className="font-serif text-base tracking-[0.3em] text-[#a88a64]">
+        <div className="border border-[#fff8ef]/90 bg-[#f2eee9] px-5 py-9 sm:px-8 sm:py-10">
+          <h3 className="text-center font-serif text-base tracking-[0.3em] text-[#a88a64]">
             RSVP
           </h3>
-          <p className="mx-auto mt-4 max-w-md font-serif text-base leading-relaxed text-[#4a1b24]">
-            Xin vui lòng xác nhận tham dự để gia đình chuẩn bị chu đáo hơn.
-          </p>
-          <a
-            href="mailto:?subject=RSVP%20L%E1%BB%85%20%C4%90%C3%ADnh%20H%C3%B4n%20Annie%20%26%20D%C5%A9ng"
-            className="mt-6 inline-flex min-h-12 w-full max-w-xs items-center justify-center border border-[#a88a64]/55 bg-[#3d1418] px-8 py-3 font-serif text-base tracking-[0.2em] text-[#f3e8d5] transition active:bg-[#4a1b24] sm:w-auto hover:bg-[#4a1b24]"
-          >
-            XÁC NHẬN THAM DỰ
-          </a>
+          
+          <div className="mx-auto mt-6 max-w-md space-y-4 text-left">
+            <p className="font-serif text-sm leading-relaxed text-[#4a1b24]">
+              Sự hiện diện của Quý khách sẽ là niềm vinh hạnh và góp phần tạo nên những kỷ niệm đẹp trong ngày cưới của chúng tôi.
+            </p>
+            
+            <p className="font-serif text-sm leading-relaxed text-[#4a1b24]">
+              Để chúng tôi có thể chuẩn bị chu đáo cho buổi tiệc, kính mong Quý khách vui lòng xác nhận tham dự trước ngày 30/12/2026 bằng cách điền thông tin bên dưới.
+            </p>
+            
+            <p className="font-serif text-sm leading-relaxed text-[#4a1b24]">
+              Xin chân thành cảm ơn và rất mong được đón tiếp Quý khách trong ngày vui của chúng tôi.
+            </p>
+          </div>
+
+          <form className="mx-auto mt-8 max-w-md space-y-6">
+            {/* Họ và Tên */}
+            <div className="text-left">
+              <label htmlFor="fullName" className="block font-serif text-sm font-medium text-[#4a1b24]">
+                Họ và Tên <span className="text-red-600">*</span>
+              </label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                required
+                className="mt-2 w-full border border-[#a88a64]/40 bg-white px-4 py-2.5 font-serif text-sm text-[#4a1b24] focus:border-[#a88a64] focus:outline-none focus:ring-1 focus:ring-[#a88a64]"
+              />
+            </div>
+
+            {/* Bạn thuộc nhóm khách */}
+            <div className="text-left">
+              <label htmlFor="guestGroup" className="block font-serif text-sm font-medium text-[#4a1b24]">
+                Bạn thuộc nhóm khách: <span className="text-red-600">*</span>
+              </label>
+              <select
+                id="guestGroup"
+                name="guestGroup"
+                required
+                className="mt-2 w-full border border-[#a88a64]/40 bg-white px-4 py-2.5 font-serif text-sm text-[#4a1b24] focus:border-[#a88a64] focus:outline-none focus:ring-1 focus:ring-[#a88a64]"
+              >
+                <option value="">Chọn nhóm khách</option>
+                <option value="nguoi-nha">Người nhà</option>
+                <option value="ban-bo-me-co-dau">Bạn của ba mẹ cô dâu</option>
+                <option value="ban-bo-me-chu-re">Bạn của ba mẹ chú rể</option>
+                <option value="ban-co-dau-chu-re">Bạn của cô dâu chú rể</option>
+                <option value="khac">Khác</option>
+              </select>
+            </div>
+
+            {/* Bạn có thể tham dự không */}
+            <div className="text-left">
+              <label className="block font-serif text-sm font-medium text-[#4a1b24]">
+                Bạn có thể tham dự không? <span className="text-red-600">*</span>
+              </label>
+              <div className="mt-2 space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="attendance"
+                    value="yes"
+                    required
+                    className="h-4 w-4 border-[#a88a64]/40 text-[#3d1418] focus:ring-[#a88a64]"
+                  />
+                  <span className="ml-2 font-serif text-sm text-[#4a1b24]">Có, tôi sẽ tham dự</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="attendance"
+                    value="no"
+                    required
+                    className="h-4 w-4 border-[#a88a64]/40 text-[#3d1418] focus:ring-[#a88a64]"
+                  />
+                  <span className="ml-2 font-serif text-sm text-[#4a1b24]">Rất tiếc, tôi không thể tham dự</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Bạn có bị dị ứng thực phẩm nào không */}
+            <div className="text-left">
+              <label htmlFor="allergies" className="block font-serif text-sm font-medium text-[#4a1b24]">
+                Bạn có bị dị ứng thực phẩm nào không? <span className="text-red-600">*</span>
+              </label>
+              <input
+                type="text"
+                id="allergies"
+                name="allergies"
+                required
+                placeholder="Không có hoặc nhập loại thực phẩm"
+                className="mt-2 w-full border border-[#a88a64]/40 bg-white px-4 py-2.5 font-serif text-sm text-[#4a1b24] placeholder:text-[#6b4a32]/50 focus:border-[#a88a64] focus:outline-none focus:ring-1 focus:ring-[#a88a64]"
+              />
+            </div>
+
+            {/* Bạn có phải người ăn chay trường không */}
+            <div className="text-left">
+              <label className="block font-serif text-sm font-medium text-[#4a1b24]">
+                Bạn có phải người ăn chay trường không <span className="text-red-600">*</span>
+              </label>
+              <div className="mt-2 space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="vegetarian"
+                    value="yes"
+                    required
+                    className="h-4 w-4 border-[#a88a64]/40 text-[#3d1418] focus:ring-[#a88a64]"
+                  />
+                  <span className="ml-2 font-serif text-sm text-[#4a1b24]">Có</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="vegetarian"
+                    value="no"
+                    required
+                    className="h-4 w-4 border-[#a88a64]/40 text-[#3d1418] focus:ring-[#a88a64]"
+                  />
+                  <span className="ml-2 font-serif text-sm text-[#4a1b24]">Không</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                className="w-full border border-[#a88a64]/55 bg-[#3d1418] px-8 py-3 font-serif text-base tracking-[0.2em] text-[#f3e8d5] transition hover:bg-[#4a1b24] active:bg-[#4a1b24]"
+              >
+                GỬI
+              </button>
+            </div>
+          </form>
         </div>
       </RevealSection>
     </div>
