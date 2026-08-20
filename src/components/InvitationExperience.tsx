@@ -47,10 +47,10 @@ export function InvitationExperience() {
 
     const idle =
       typeof window !== "undefined" && "requestIdleCallback" in window
-        ? window.requestIdleCallback(enable, { timeout: 900 })
+        ? window.requestIdleCallback(enable, { timeout: 400 })
         : null;
     const timeout =
-      idle === null ? window.setTimeout(enable, 450) : null;
+      idle === null ? window.setTimeout(enable, 120) : null;
 
     return () => {
       cancelled = true;
@@ -73,14 +73,15 @@ export function InvitationExperience() {
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         <LanguageToggle />
-        {fxReady ? <BackgroundSparkles density={16} active /> : null}
+        {/* Above page fill, below envelope UI — sections must stay transparent */}
+        {fxReady ? <BackgroundSparkles density={22} active /> : null}
 
         <div
           aria-hidden
           className="pointer-events-none fixed inset-0 -z-10 bg-[#3d1418]"
         />
 
-        <div className="relative z-10">
+        <div className="relative z-10 bg-transparent">
           <EnvelopeOpening
             opened={opened}
             onComplete={unlockScroll}

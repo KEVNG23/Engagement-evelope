@@ -13,7 +13,7 @@ export function InvitationDetails() {
   const { t } = useLocale();
 
   return (
-    <div className="relative w-full bg-[#3d1418] pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
+    <div className="relative w-full bg-transparent pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
       <section
         id="invitation-details"
         className="scroll-mt-6 mx-auto w-full max-w-lg px-4 sm:max-w-xl sm:px-6"

@@ -244,7 +244,7 @@ export function RsvpForm() {
   );
 
   return (
-    <section id="rsvp" className="bg-[#3d1418]">
+    <section id="rsvp" className="bg-transparent">
       <div className="relative h-[38svh] min-h-[220px] w-full overflow-hidden">
         <Image
           src="/assets/rsvp-floral.webp"

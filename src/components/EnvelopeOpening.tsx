@@ -138,7 +138,7 @@ export function EnvelopeOpening({
   const finished = phase === "done" || opened;
 
   return (
-    <section className="relative flex min-h-[100svh] min-h-[100dvh] w-full flex-col items-center justify-center bg-[#3d1418] px-4 py-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-5">
+    <section className="relative flex min-h-[100svh] min-h-[100dvh] w-full flex-col items-center justify-center bg-transparent px-4 py-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-5">
       <motion.div
         className="relative z-40 mb-3 max-w-[22rem] shrink-0 text-center sm:mb-5"
         initial={false}
