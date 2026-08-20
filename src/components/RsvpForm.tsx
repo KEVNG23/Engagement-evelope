@@ -265,7 +265,7 @@ export function RsvpForm() {
         </div>
       </div>
 
-      <div className="px-6 pb-24 pt-12 sm:pb-28">
+      <div className="px-6 pb-10 pt-12 sm:pb-12">
         <div className="mx-auto w-full max-w-[620px]">
           <p className="mb-4 text-center font-serif text-[1rem] leading-relaxed text-[#e0c9a8]">
             {t("rsvpIntro1")}
