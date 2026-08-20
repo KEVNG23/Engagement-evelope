@@ -1,8 +1,8 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { invitation, TIMING } from "@/lib/invitation-data";
 import { displayFont, scriptFont, serifFont } from "@/lib/fonts";
 import { useLocale } from "@/lib/i18n";
@@ -33,7 +33,6 @@ export function EnvelopeOpening({
 }: EnvelopeOpeningProps) {
   const reduceMotion = useReducedMotion();
   const { t, locale } = useLocale();
-  const labelId = useId();
   const [phase, setPhase] = useState<EnvelopePhase>("idle");
   const [closedReady, setClosedReady] = useState(false);
   const phaseRef = useRef<EnvelopePhase>("idle");
@@ -172,8 +171,7 @@ export function EnvelopeOpening({
       >
         <button
           type="button"
-          aria-labelledby={labelId}
-          aria-describedby={phase === "idle" ? `${labelId}-hint` : undefined}
+          aria-label={t("openLabel")}
           onClick={openEnvelope}
           onKeyDown={onKeyDown}
           disabled={phase !== "idle" || !closedReady}
@@ -362,74 +360,27 @@ export function EnvelopeOpening({
         </button>
       </motion.div>
 
-      <div className="relative z-10 mt-6 flex min-h-[4.25rem] shrink-0 flex-col items-center gap-1.5 text-center">
-        <AnimatePresence mode="wait">
-          {phase === "idle" ? (
-            <motion.div
-              key="cta"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center gap-1.5"
-            >
-              <p
-                id={labelId}
-                className="font-serif text-sm tracking-[0.24em] text-[#f3e8d5]"
-              >
-                {t("openLabel")}
-              </p>
-              {locale === "vi" ? (
-                <p
-                  id={`${labelId}-hint`}
-                  className="text-[11px] tracking-[0.2em] text-[#d4b98a]/85"
-                >
-                  {t("openLabelEn")}
-                </p>
-              ) : null}
-            </motion.div>
-          ) : finished ? (
-            <motion.div
-              key="scroll"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center gap-2"
-            >
-              <p className="font-serif text-[11px] tracking-[0.28em] text-[#d4b98a]/90">
-                {t("scrollDetails")}
-              </p>
-              <motion.span
-                aria-hidden
-                className="text-[#d4b98a]"
-                animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
-                transition={{
-                  duration: 1.4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                ↓
-              </motion.span>
-            </motion.div>
-          ) : (
-            <motion.p
-              key="opening"
-              className="font-serif text-xs tracking-[0.28em] text-[#d4b98a]/8"
-            >
-              {t("opening")}
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        {!finished ? (
-          <button
-            type="button"
-            onClick={handleSkip}
-            className="mt-2 text-xs tracking-[0.16em] text-[#f3e8d5]/70 underline-offset-4 hover:underline"
+      {finished ? (
+        <div className="relative z-10 mt-6 flex shrink-0 flex-col items-center gap-2 text-center">
+          <p className="font-serif text-[11px] tracking-[0.28em] text-[#d4b98a]/90">
+            {t("scrollDetails")}
+          </p>
+          <motion.span
+            aria-hidden
+            className="text-[#d4b98a]"
+            animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
+            transition={{
+              duration: 1.4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
           >
-            {t("skipLabel")}
-          </button>
-        ) : null}
-      </div>
+            ↓
+          </motion.span>
+        </div>
+      ) : (
+        <div className="mt-6 min-h-[1rem]" aria-hidden />
+      )}
     </section>
   );
 }
