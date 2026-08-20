@@ -259,41 +259,62 @@ export function EnvelopeOpening({
                       }
                 }
               >
-                <div className="relative aspect-[3/4] w-full shadow-[0_16px_28px_rgba(0,0,0,0.45)]">
+                <div
+                  className="relative w-full"
+                  style={{
+                    filter: "drop-shadow(0 14px 22px rgba(0, 0, 0, 0.42))",
+                  }}
+                >
                   <div
-                    aria-hidden
-                    className="absolute inset-[12%] rounded-[50%] bg-[#faf1da]"
-                  />
-                  <Image
-                    src="/assets/lace-frame.webp"
-                    alt=""
-                    fill
-                    priority
-                    quality={75}
-                    draggable={false}
-                    sizes="200px"
-                    className="object-contain"
-                  />
-                  <div className="absolute inset-[17%] flex flex-col items-center justify-center px-1.5 text-center">
-                    <p className="font-serif text-[7px] tracking-[0.28em] text-[#6b4a32] sm:text-[8px]">
-                      {t("saveTheDate")}
-                    </p>
-                    <p className="mt-0.5 font-serif text-[9px] tracking-[0.14em] text-[#3d1418] sm:text-[10px]">
-                      {t("title")}
-                    </p>
-                    <p
-                      className={`${scriptFont.className} mt-1 text-base leading-tight text-[#3d1418] sm:text-lg`}
-                    >
-                      {invitation.brideLetter}
-                    </p>
-                    <p className="my-0.5 font-serif text-[10px] text-[#3d1418]">
-                      &
-                    </p>
-                    <p
-                      className={`${scriptFont.className} text-base leading-tight text-[#3d1418] sm:text-lg`}
-                    >
-                      {invitation.groom}
-                    </p>
+                    className="relative aspect-[3/4] w-full"
+                    style={{
+                      // Clip everything to the lace silhouette — no rectangular card
+                      WebkitMaskImage: "url(/assets/lace-frame.webp)",
+                      maskImage: "url(/assets/lace-frame.webp)",
+                      WebkitMaskSize: "contain",
+                      maskSize: "contain",
+                      WebkitMaskRepeat: "no-repeat",
+                      maskRepeat: "no-repeat",
+                      WebkitMaskPosition: "center",
+                      maskPosition: "center",
+                    }}
+                  >
+                    <div
+                      aria-hidden
+                      className="absolute inset-[15%] rounded-[50%] bg-[#faf1da]"
+                    />
+                    {/* unoptimized keeps lace alpha intact (no rectangular bake-in) */}
+                    <Image
+                      src="/assets/lace-frame.webp"
+                      alt=""
+                      fill
+                      priority
+                      unoptimized
+                      draggable={false}
+                      sizes="200px"
+                      className="object-contain"
+                    />
+                    <div className="absolute inset-[18%] flex flex-col items-center justify-center px-1.5 text-center">
+                      <p className="font-serif text-[7px] tracking-[0.28em] text-[#6b4a32] sm:text-[8px]">
+                        {t("saveTheDate")}
+                      </p>
+                      <p className="mt-0.5 font-serif text-[9px] tracking-[0.14em] text-[#3d1418] sm:text-[10px]">
+                        {t("title")}
+                      </p>
+                      <p
+                        className={`${scriptFont.className} mt-1 text-base leading-tight text-[#3d1418] sm:text-lg`}
+                      >
+                        {invitation.brideLetter}
+                      </p>
+                      <p className="my-0.5 font-serif text-[10px] text-[#3d1418]">
+                        &
+                      </p>
+                      <p
+                        className={`${scriptFont.className} text-base leading-tight text-[#3d1418] sm:text-lg`}
+                      >
+                        {invitation.groom}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </motion.div>
