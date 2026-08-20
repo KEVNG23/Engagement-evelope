@@ -269,6 +269,10 @@ export function EnvelopeOpening({
                 }
               >
                 <div className="relative aspect-[3/4] w-full drop-shadow-[0_16px_28px_rgba(0,0,0,0.45)]">
+                  <div
+                    aria-hidden
+                    className="absolute inset-[12%] rounded-[50%] bg-[#faf1da]"
+                  />
                   <Image
                     src="/assets/lace-frame.png"
                     alt=""

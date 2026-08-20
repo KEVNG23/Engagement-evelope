@@ -17,7 +17,7 @@ export function InvitationDetails() {
         aria-label="Chi tiết lễ đính hôn"
       >
         <RevealSection>
-          <article className="border border-[#fff8ef]/90 bg-[#f2eee9] px-5 py-9 text-center text-[#6b4a32] shadow-none sm:px-10 sm:py-12">
+          <article className="border border-[#fff8ef]/90 bg-[#faf1da] px-5 py-9 text-center text-[#6b4a32] shadow-none sm:px-10 sm:py-12">
             <p className="font-serif text-[14px] leading-relaxed tracking-wide sm:text-base">
               {invitation.ceremonyLine}
             </p>
