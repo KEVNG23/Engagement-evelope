@@ -287,7 +287,7 @@ export function EnvelopeOpening({
                     <p
                       className={`${scriptFont.className} mt-1 text-base leading-tight text-[#3d1418] sm:text-lg`}
                     >
-                      {invitation.bride}
+                      {invitation.groom}
                     </p>
                     <p className="my-0.5 font-serif text-[10px] text-[#3d1418]">
                       &
@@ -295,7 +295,7 @@ export function EnvelopeOpening({
                     <p
                       className={`${scriptFont.className} text-base leading-tight text-[#3d1418] sm:text-lg`}
                     >
-                      {invitation.groom}
+                      {invitation.bride}
                     </p>
                   </div>
                 </div>
