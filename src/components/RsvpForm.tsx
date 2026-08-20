@@ -247,14 +247,14 @@ export function RsvpForm() {
     <section id="rsvp" className="bg-[#3d1418]">
       <div className="relative h-[38svh] min-h-[220px] w-full overflow-hidden">
         <Image
-          src="/assets/peony.webp"
+          src="/assets/rsvp-floral.webp"
           alt=""
           fill
           sizes="100vw"
-          quality={75}
-          className="object-cover object-center opacity-80"
+          priority={false}
+          className="object-cover object-left opacity-90"
         />
-        <div className="absolute inset-0 bg-[rgba(53,18,24,0.55)]" />
+        <div className="absolute inset-0 bg-[rgba(53,18,24,0.48)]" />
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-[#3d1418]" />
         <div className="relative flex h-full items-center justify-center px-4">
           <h2
