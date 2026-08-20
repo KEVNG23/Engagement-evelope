@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { invitation, TIMING } from "@/lib/invitation-data";
-import { displayFont, scriptFont } from "@/lib/fonts";
+import { displayFont, scriptFont, serifFont } from "@/lib/fonts";
 import { useLocale } from "@/lib/i18n";
 import { luxuryTransition } from "@/lib/motion";
 
@@ -150,9 +150,11 @@ export function EnvelopeOpening({
         transition={luxuryTransition(0.4)}
       >
         <p
-          className={`${displayFont.className} text-[9px] uppercase tracking-[0.28em] text-[#f3e8d5] sm:text-[11px] sm:tracking-[0.42em]`}
+          className={`${
+            locale === "vi" ? serifFont.className : displayFont.className
+          } text-[9px] uppercase tracking-[0.28em] text-[#f3e8d5] sm:text-[11px] sm:tracking-[0.42em]`}
         >
-          YOU&apos;VE GOT INVITED FROM
+          {t("inviteFrom")}
         </p>
         <h1
           className={`${scriptFont.className} mt-2 text-[clamp(2.4rem,11vw,4.75rem)] leading-[1.08] text-[#fff8ef]`}

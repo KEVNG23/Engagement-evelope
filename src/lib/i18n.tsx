@@ -16,6 +16,7 @@ const STORAGE_KEY = "engagement-locale";
 
 const messages = {
   vi: {
+    inviteFrom: "THIỆP MỜI TỪ",
     openLabel: "Nhấn để mở thiệp",
     openLabelEn: "Click to Open",
     skipLabel: "Bỏ qua hoạt ảnh",
@@ -80,6 +81,7 @@ const messages = {
     langEn: "English",
   },
   en: {
+    inviteFrom: "YOU'VE GOT INVITED FROM",
     openLabel: "Tap to open the invitation",
     openLabelEn: "Click to Open",
     skipLabel: "Skip animation",
