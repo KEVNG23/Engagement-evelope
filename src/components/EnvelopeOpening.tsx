@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { invitation, TIMING } from "@/lib/invitation-data";
 import { displayFont, scriptFont } from "@/lib/fonts";
+import { useLocale } from "@/lib/i18n";
 import { luxuryTransition } from "@/lib/motion";
 
 export type EnvelopePhase = "idle" | "opening" | "risen" | "done";
@@ -31,6 +32,7 @@ export function EnvelopeOpening({
   onOpenStart,
 }: EnvelopeOpeningProps) {
   const reduceMotion = useReducedMotion();
+  const { t, locale } = useLocale();
   const labelId = useId();
   const [phase, setPhase] = useState<EnvelopePhase>("idle");
   const [hovered, setHovered] = useState(false);
@@ -137,7 +139,7 @@ export function EnvelopeOpening({
         <p
           className={`${displayFont.className} text-[9px] uppercase tracking-[0.28em] text-[#f3e8d5] sm:text-[11px] sm:tracking-[0.42em]`}
         >
-          {invitation.inviteFrom}
+          {t("inviteFrom")}
         </p>
         <h1
           className={`${scriptFont.className} mt-2 text-[clamp(2.4rem,11vw,4.75rem)] leading-[1.08] text-[#fff8ef]`}
@@ -283,10 +285,10 @@ export function EnvelopeOpening({
                   />
                   <div className="absolute inset-[17%] flex flex-col items-center justify-center px-1.5 text-center">
                     <p className="font-serif text-[7px] tracking-[0.28em] text-[#6b4a32] sm:text-[8px]">
-                      {invitation.saveTheDate}
+                      {t("saveTheDate")}
                     </p>
                     <p className="mt-0.5 font-serif text-[9px] tracking-[0.14em] text-[#3d1418] sm:text-[10px]">
-                      {invitation.title}
+                      {t("title")}
                     </p>
                     <p
                       className={`${scriptFont.className} mt-1 text-base leading-tight text-[#3d1418] sm:text-lg`}
@@ -345,14 +347,16 @@ export function EnvelopeOpening({
                 id={labelId}
                 className="font-serif text-sm tracking-[0.24em] text-[#f3e8d5]"
               >
-                {invitation.openLabel}
+                {t("openLabel")}
               </p>
-              <p
-                id={`${labelId}-hint`}
-                className="text-[11px] tracking-[0.2em] text-[#d4b98a]/85"
-              >
-                {invitation.openLabelEn}
-              </p>
+              {locale === "vi" ? (
+                <p
+                  id={`${labelId}-hint`}
+                  className="text-[11px] tracking-[0.2em] text-[#d4b98a]/85"
+                >
+                  {t("openLabelEn")}
+                </p>
+              ) : null}
             </motion.div>
           ) : finished ? (
             <motion.div
@@ -362,7 +366,7 @@ export function EnvelopeOpening({
               className="flex flex-col items-center gap-2"
             >
               <p className="font-serif text-[11px] tracking-[0.28em] text-[#d4b98a]/90">
-                Cuộn xuống để xem chi tiết
+                {t("scrollDetails")}
               </p>
               <motion.span
                 aria-hidden
@@ -382,7 +386,7 @@ export function EnvelopeOpening({
               key="opening"
               className="font-serif text-xs tracking-[0.28em] text-[#d4b98a]/8"
             >
-              Đang mở thiệp…
+              {t("opening")}
             </motion.p>
           )}
         </AnimatePresence>
@@ -393,7 +397,7 @@ export function EnvelopeOpening({
             onClick={handleSkip}
             className="mt-2 text-xs tracking-[0.16em] text-[#f3e8d5]/70 underline-offset-4 hover:underline"
           >
-            {invitation.skipLabel}
+            {t("skipLabel")}
           </button>
         ) : null}
       </div>

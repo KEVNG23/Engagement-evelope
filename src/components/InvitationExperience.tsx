@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { LocaleProvider } from "@/lib/i18n";
 import { EnvelopeOpening } from "./EnvelopeOpening";
 import { FloatingParticles } from "./FloatingParticles";
 import { BackgroundSparkles } from "./BackgroundSparkles";
 import { InvitationDetails } from "./InvitationDetails";
+import { LanguageToggle } from "./LanguageToggle";
 
 /**
  * Scroll lives on this container (not document), which is reliable on mobile /
@@ -35,48 +37,51 @@ export function InvitationExperience() {
   }, []);
 
   return (
-    <main
-      ref={scrollerRef}
-      className={
-        opened
-          ? "invite-scroller relative h-[100dvh] w-full overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] text-[#f3e8d5] touch-pan-y"
-          : "invite-scroller relative h-[100dvh] w-full overflow-hidden bg-[#3d1418] text-[#f3e8d5] touch-none"
-      }
-      style={{ WebkitOverflowScrolling: "touch" }}
-    >
-      <BackgroundSparkles density={36} active />
-      <FloatingParticles density={24} active />
+    <LocaleProvider>
+      <main
+        ref={scrollerRef}
+        className={
+          opened
+            ? "invite-scroller relative h-[100dvh] w-full overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] text-[#f3e8d5] touch-pan-y"
+            : "invite-scroller relative h-[100dvh] w-full overflow-hidden bg-[#3d1418] text-[#f3e8d5] touch-none"
+        }
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
+        <LanguageToggle />
+        <BackgroundSparkles density={36} active />
+        <FloatingParticles density={24} active />
 
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 bg-[#3d1418]"
-      />
-
-      <div className="relative z-10">
-        <EnvelopeOpening
-          opened={opened}
-          onComplete={unlockScroll}
-          onSkip={unlockScroll}
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 -z-10 bg-[#3d1418]"
         />
 
-        <motion.div
-          aria-hidden={!opened}
-          initial={false}
-          animate={{ opacity: opened ? 1 : 0 }}
-          transition={
-            reduceMotion
-              ? { duration: 0 }
-              : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }
-          }
-          className={
-            opened
-              ? "pointer-events-auto"
-              : "pointer-events-none h-0 overflow-hidden"
-          }
-        >
-          {opened ? <InvitationDetails /> : null}
-        </motion.div>
-      </div>
-    </main>
+        <div className="relative z-10">
+          <EnvelopeOpening
+            opened={opened}
+            onComplete={unlockScroll}
+            onSkip={unlockScroll}
+          />
+
+          <motion.div
+            aria-hidden={!opened}
+            initial={false}
+            animate={{ opacity: opened ? 1 : 0 }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }
+            }
+            className={
+              opened
+                ? "pointer-events-auto"
+                : "pointer-events-none h-0 overflow-hidden"
+            }
+          >
+            {opened ? <InvitationDetails /> : null}
+          </motion.div>
+        </div>
+      </main>
+    </LocaleProvider>
   );
 }

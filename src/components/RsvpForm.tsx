@@ -4,18 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { displayFont } from "@/lib/fonts";
-
-const GUEST_GROUPS = [
-  "Người nhà",
-  "Bạn của ba mẹ cô dâu",
-  "Bạn của ba mẹ chú rể",
-  "Bạn của cô dâu chú rể",
-] as const;
-
-const ATTEND_OPTIONS = [
-  "Có, tôi sẽ tham dự",
-  "Rất tiếc, tôi không thể tham dự",
-] as const;
+import { rsvpValueMap, useLocale } from "@/lib/i18n";
 
 const STORAGE_KEY = "engagement-rsvp-token";
 
@@ -24,8 +13,10 @@ type Status = "idle" | "submitting" | "success" | "error" | "already";
 /**
  * Native RSVP form with private view link (option 3).
  * One browser keeps the token in localStorage; the link works on any device.
+ * UI can be English; stored / Google Form values stay Vietnamese.
  */
 export function RsvpForm() {
+  const { t } = useLocale();
   const [name, setName] = useState("");
   const [guestGroup, setGuestGroup] = useState("");
   const [guestGroupOther, setGuestGroupOther] = useState("");
@@ -139,13 +130,10 @@ export function RsvpForm() {
   const doneCard = (
     <div className="rounded-sm border border-[#e0c9a8]/40 bg-[#5a2730]/50 px-5 py-8 text-center">
       <p className="font-serif text-[#f7ecd9]">
-        {status === "already"
-          ? "Quý khách đã gửi phúc đáp trên thiết bị này."
-          : "Cảm ơn Quý khách đã gửi phúc đáp!"}
+        {status === "already" ? t("rsvpAlready") : t("rsvpThanks")}
       </p>
       <p className="mt-4 font-serif text-sm leading-relaxed text-[#d4b89a]">
-        Lưu link riêng bên dưới để xem lại câu trả lời bất kỳ lúc nào — không
-        cần đăng nhập.
+        {t("rsvpSaveLink")}
       </p>
       {shareUrl ? (
         <p className="mt-5 break-all font-serif text-sm text-[#e0c9a8]">
@@ -158,7 +146,7 @@ export function RsvpForm() {
             href={`/rsvp/${token}`}
             className="bg-[#e0c9a8] px-5 py-3 font-serif text-sm uppercase tracking-[0.14em] text-[#3d1418] transition-opacity hover:opacity-90"
           >
-            Xem phúc đáp
+            {t("rsvpView")}
           </Link>
         ) : null}
         <button
@@ -166,7 +154,7 @@ export function RsvpForm() {
           onClick={copyLink}
           className="border border-[#e0c9a8]/55 px-5 py-3 font-serif text-sm tracking-[0.12em] text-[#e0c9a8] transition-colors hover:border-[#e0c9a8]"
         >
-          {copied ? "Đã copy" : "Copy link"}
+          {copied ? t("rsvpCopied") : t("rsvpCopy")}
         </button>
       </div>
     </div>
@@ -188,7 +176,7 @@ export function RsvpForm() {
           <h2
             className={`${displayFont.className} text-center text-[clamp(2rem,9vw,4rem)] tracking-[0.12em] text-[#f7ecd9] drop-shadow-[0_2px_20px_rgba(30,8,12,0.6)]`}
           >
-            THIỆP PHÚC ĐÁP
+            {t("rsvpTitle")}
           </h2>
         </div>
       </div>
@@ -196,17 +184,13 @@ export function RsvpForm() {
       <div className="px-6 pb-24 pt-12 sm:pb-28">
         <div className="mx-auto w-full max-w-[620px]">
           <p className="mb-4 text-center font-serif text-[1rem] leading-relaxed text-[#e0c9a8]">
-            Sự hiện diện của Quý khách sẽ là niềm vinh hạnh và góp phần tạo nên
-            những kỷ niệm đẹp trong ngày vui của chúng tôi.
+            {t("rsvpIntro1")}
           </p>
           <p className="mb-4 text-center font-serif text-[0.95rem] leading-relaxed text-[#d4b89a] italic">
-            Để chúng tôi có thể chuẩn bị chu đáo cho buổi tiệc, kính mong Quý
-            khách vui lòng xác nhận tham dự trước ngày 30/11/2026 bằng cách
-            điền thông tin bên dưới.
+            {t("rsvpIntro2")}
           </p>
           <p className="mb-10 text-center font-serif text-[0.95rem] leading-relaxed text-[#e0c9a8]">
-            Xin chân thành cảm ơn và rất mong được đón tiếp Quý khách trong
-            ngày vui của chúng tôi.
+            {t("rsvpIntro3")}
           </p>
 
           {status === "success" || status === "already" ? (
@@ -215,7 +199,7 @@ export function RsvpForm() {
             <form className="mt-2 space-y-7" onSubmit={onSubmit}>
               <div>
                 <label htmlFor="rsvp-name" className={fieldLabel}>
-                  Họ và Tên <span className="text-[#f0b8a8]">*</span>
+                  {t("rsvpName")} <span className="text-[#f0b8a8]">*</span>
                 </label>
                 <input
                   id="rsvp-name"
@@ -229,22 +213,24 @@ export function RsvpForm() {
 
               <div>
                 <p className={fieldLabel}>
-                  Bạn thuộc nhóm khách:{" "}
+                  {t("rsvpGuestGroup")}{" "}
                   <span className="text-[#f0b8a8]">*</span>
                 </p>
                 <div className="space-y-2">
-                  {GUEST_GROUPS.map((option) => (
-                    <label key={option} className={radioRow}>
+                  {rsvpValueMap.guestGroups.map((option) => (
+                    <label key={option.vi} className={radioRow}>
                       <input
                         type="radio"
                         required
                         name="guestGroup"
-                        value={option}
-                        checked={guestGroup === option}
-                        onChange={() => setGuestGroup(option)}
+                        value={option.vi}
+                        checked={guestGroup === option.vi}
+                        onChange={() => setGuestGroup(option.vi)}
                         className="h-4 w-4 accent-[#e0c9a8]"
                       />
-                      <span className="font-serif text-[0.95rem]">{option}</span>
+                      <span className="font-serif text-[0.95rem]">
+                        {t(option.key)}
+                      </span>
                     </label>
                   ))}
                   <label className={radioRow}>
@@ -257,7 +243,9 @@ export function RsvpForm() {
                       onChange={() => setGuestGroup("Other")}
                       className="h-4 w-4 accent-[#e0c9a8]"
                     />
-                    <span className="font-serif text-[0.95rem]">Other:</span>
+                    <span className="font-serif text-[0.95rem]">
+                      {t("rsvpOther")}
+                    </span>
                   </label>
                   {guestGroup === "Other" ? (
                     <input
@@ -265,7 +253,7 @@ export function RsvpForm() {
                       maxLength={120}
                       value={guestGroupOther}
                       onChange={(e) => setGuestGroupOther(e.target.value)}
-                      placeholder="Vui lòng ghi rõ"
+                      placeholder={t("rsvpOtherPlaceholder")}
                       className={`${textInput} mt-2`}
                     />
                   ) : null}
@@ -274,19 +262,18 @@ export function RsvpForm() {
 
               <div>
                 <p className={fieldLabel}>
-                  Bạn có thể tham dự không?{" "}
-                  <span className="text-[#f0b8a8]">*</span>
+                  {t("rsvpAttend")} <span className="text-[#f0b8a8]">*</span>
                 </p>
                 <div className="space-y-3">
-                  {ATTEND_OPTIONS.map((option) => (
+                  {rsvpValueMap.attend.map((option) => (
                     <button
-                      key={option}
+                      key={option.vi}
                       type="button"
-                      aria-pressed={attend === option}
-                      onClick={() => setAttend(option)}
-                      className={choiceBtn(attend === option)}
+                      aria-pressed={attend === option.vi}
+                      onClick={() => setAttend(option.vi)}
+                      className={choiceBtn(attend === option.vi)}
                     >
-                      {option}
+                      {t(option.key)}
                     </button>
                   ))}
                 </div>
@@ -294,42 +281,38 @@ export function RsvpForm() {
 
               <div>
                 <label htmlFor="rsvp-allergy" className={fieldLabel}>
-                  Bạn có bị dị ứng thực phẩm nào không?{" "}
-                  <span className="text-[#f0b8a8]">*</span>
+                  {t("rsvpAllergy")} <span className="text-[#f0b8a8]">*</span>
                 </label>
                 <input
                   id="rsvp-allergy"
                   required
                   value={allergy}
                   onChange={(e) => setAllergy(e.target.value)}
-                  placeholder="Nếu có, vui lòng ghi rõ"
+                  placeholder={t("rsvpAllergyPlaceholder")}
                   className={textInput}
                 />
               </div>
 
               <div>
                 <p className={fieldLabel}>
-                  Bạn có phải người ăn chay trường không{" "}
+                  {t("rsvpVegetarian")}{" "}
                   <span className="text-[#f0b8a8]">*</span>
                 </p>
                 <div className="space-y-2">
-                  {(
-                    [
-                      ["Có", "Có"],
-                      ["Không", "Không"],
-                    ] as const
-                  ).map(([label, value]) => (
-                    <label key={value} className={radioRow}>
+                  {rsvpValueMap.yesNo.map((option) => (
+                    <label key={option.vi} className={radioRow}>
                       <input
                         type="radio"
                         required
                         name="vegetarian"
-                        value={value}
-                        checked={vegetarian === value}
-                        onChange={() => setVegetarian(value)}
+                        value={option.vi}
+                        checked={vegetarian === option.vi}
+                        onChange={() => setVegetarian(option.vi)}
                         className="h-4 w-4 accent-[#e0c9a8]"
                       />
-                      <span className="font-serif text-[0.95rem]">{label}</span>
+                      <span className="font-serif text-[0.95rem]">
+                        {t(option.key)}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -337,7 +320,7 @@ export function RsvpForm() {
 
               {status === "error" ? (
                 <p className="text-center font-serif text-sm text-[#f0b8a8]">
-                  Không gửi được. Vui lòng thử lại.
+                  {t("rsvpError")}
                 </p>
               ) : null}
 
@@ -346,7 +329,7 @@ export function RsvpForm() {
                 disabled={!canSubmit}
                 className="w-full bg-[#e0c9a8] px-6 py-4 font-serif text-[0.9rem] uppercase tracking-[0.18em] text-[#3d1418] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {status === "submitting" ? "Đang gửi…" : "Gửi"}
+                {status === "submitting" ? t("rsvpSubmitting") : t("rsvpSubmit")}
               </button>
             </form>
           )}
