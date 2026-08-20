@@ -249,7 +249,7 @@ export function EnvelopeOpening({
 
               {/* LETTER — rises from the open pocket */}
               <motion.div
-                className="absolute left-1/2 w-[46%]"
+                className="absolute left-1/2 w-[56%]"
                 style={{ bottom: "30%", transformOrigin: "center bottom" }}
                 initial={false}
                 animate={
@@ -274,26 +274,26 @@ export function EnvelopeOpening({
                     alt=""
                     fill
                     draggable={false}
-                    sizes="170px"
+                    sizes="200px"
                     className="object-contain"
                   />
                   <div className="absolute inset-[17%] flex flex-col items-center justify-center px-1.5 text-center">
-                    <p className="font-serif text-[6px] tracking-[0.28em] text-[#6b4a32] sm:text-[7px]">
+                    <p className="font-serif text-[7px] tracking-[0.28em] text-[#6b4a32] sm:text-[8px]">
                       {invitation.saveTheDate}
                     </p>
-                    <p className="mt-0.5 font-serif text-[8px] tracking-[0.14em] text-[#3d1418] sm:text-[9px]">
+                    <p className="mt-0.5 font-serif text-[9px] tracking-[0.14em] text-[#3d1418] sm:text-[10px]">
                       {invitation.title}
                     </p>
                     <p
-                      className={`${scriptFont.className} mt-1 text-sm leading-tight text-[#3d1418] sm:text-base`}
+                      className={`${scriptFont.className} mt-1 text-base leading-tight text-[#3d1418] sm:text-lg`}
                     >
                       {invitation.bride}
                     </p>
-                    <p className="my-0.5 font-serif text-[9px] text-[#3d1418]">
+                    <p className="my-0.5 font-serif text-[10px] text-[#3d1418]">
                       &
                     </p>
                     <p
-                      className={`${scriptFont.className} text-sm leading-tight text-[#3d1418] sm:text-base`}
+                      className={`${scriptFont.className} text-base leading-tight text-[#3d1418] sm:text-lg`}
                     >
                       {invitation.groom}
                     </p>
