@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useMemo, useState } from "react";
+import Link from "next/link";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { displayFont } from "@/lib/fonts";
 
 const GUEST_GROUPS = [
@@ -16,11 +17,13 @@ const ATTEND_OPTIONS = [
   "Rất tiếc, tôi không thể tham dự",
 ] as const;
 
-type Status = "idle" | "submitting" | "success" | "error" | "signin";
+const STORAGE_KEY = "engagement-rsvp-token";
+
+type Status = "idle" | "submitting" | "success" | "error" | "already";
 
 /**
- * Native RSVP form styled like wedding.einvitation.blog,
- * submitting into the engagement Google Form via /api/rsvp.
+ * Native RSVP form with private view link (option 3).
+ * One browser keeps the token in localStorage; the link works on any device.
  */
 export function RsvpForm() {
   const [name, setName] = useState("");
@@ -30,13 +33,39 @@ export function RsvpForm() {
   const [allergy, setAllergy] = useState("");
   const [vegetarian, setVegetarian] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [token, setToken] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (saved && /^[a-f0-9]{32}$/i.test(saved)) {
+      setToken(saved);
+      setStatus("already");
+      setShareUrl(`${window.location.origin}/rsvp/${saved}`);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    setShareUrl(`${window.location.origin}/rsvp/${token}`);
+  }, [token]);
 
   const canSubmit = useMemo(() => {
+    if (status === "already" || status === "success") return false;
     if (!name.trim() || !guestGroup || !attend || !allergy.trim() || !vegetarian)
       return false;
     if (guestGroup === "Other" && !guestGroupOther.trim()) return false;
     return status !== "submitting";
-  }, [name, guestGroup, guestGroupOther, attend, allergy, vegetarian, status]);
+  }, [
+    name,
+    guestGroup,
+    guestGroupOther,
+    attend,
+    allergy,
+    vegetarian,
+    status,
+  ]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,19 +89,17 @@ export function RsvpForm() {
 
       const data = (await response.json().catch(() => null)) as {
         ok?: boolean;
-        error?: string;
-        message?: string;
+        token?: string;
+        path?: string;
       } | null;
 
-      if (!response.ok || !data?.ok) {
-        if (data?.error === "form_requires_sign_in") {
-          setStatus("signin");
-        } else {
-          setStatus("error");
-        }
+      if (!response.ok || !data?.ok || !data.token) {
+        setStatus("error");
         return;
       }
 
+      window.localStorage.setItem(STORAGE_KEY, data.token);
+      setToken(data.token);
       setStatus("success");
       setName("");
       setGuestGroup("");
@@ -82,6 +109,17 @@ export function RsvpForm() {
       setVegetarian("");
     } catch {
       setStatus("error");
+    }
+  }
+
+  async function copyLink() {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
     }
   }
 
@@ -97,6 +135,42 @@ export function RsvpForm() {
         ? "border-[#e0c9a8] bg-[#5a2730] text-[#f7ecd9]"
         : "border-[#7d4652] bg-[#5a2730]/60 text-[#e5c9b8] hover:border-[#b98c78]"
     }`;
+
+  const doneCard = (
+    <div className="rounded-sm border border-[#e0c9a8]/40 bg-[#5a2730]/50 px-5 py-8 text-center">
+      <p className="font-serif text-[#f7ecd9]">
+        {status === "already"
+          ? "Quý khách đã gửi phúc đáp trên thiết bị này."
+          : "Cảm ơn Quý khách đã gửi phúc đáp!"}
+      </p>
+      <p className="mt-4 font-serif text-sm leading-relaxed text-[#d4b89a]">
+        Lưu link riêng bên dưới để xem lại câu trả lời bất kỳ lúc nào — không
+        cần đăng nhập.
+      </p>
+      {shareUrl ? (
+        <p className="mt-5 break-all font-serif text-sm text-[#e0c9a8]">
+          {shareUrl}
+        </p>
+      ) : null}
+      <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        {token ? (
+          <Link
+            href={`/rsvp/${token}`}
+            className="bg-[#e0c9a8] px-5 py-3 font-serif text-sm uppercase tracking-[0.14em] text-[#3d1418] transition-opacity hover:opacity-90"
+          >
+            Xem phúc đáp
+          </Link>
+        ) : null}
+        <button
+          type="button"
+          onClick={copyLink}
+          className="border border-[#e0c9a8]/55 px-5 py-3 font-serif text-sm tracking-[0.12em] text-[#e0c9a8] transition-colors hover:border-[#e0c9a8]"
+        >
+          {copied ? "Đã copy" : "Copy link"}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <section id="rsvp" className="bg-[#3d1418]">
@@ -135,10 +209,8 @@ export function RsvpForm() {
             ngày vui của chúng tôi.
           </p>
 
-          {status === "success" ? (
-            <p className="rounded-sm border border-[#e0c9a8]/40 bg-[#5a2730]/50 px-5 py-8 text-center font-serif text-[#f7ecd9]">
-              Cảm ơn Quý khách đã gửi phúc đáp!
-            </p>
+          {status === "success" || status === "already" ? (
+            doneCard
           ) : (
             <form className="mt-2 space-y-7" onSubmit={onSubmit}>
               <div>
@@ -262,15 +334,6 @@ export function RsvpForm() {
                   ))}
                 </div>
               </div>
-
-              {status === "signin" ? (
-                <p className="text-center font-serif text-sm leading-relaxed text-[#f0b8a8]">
-                  Google Form đang yêu cầu đăng nhập Google nên phản hồi chưa
-                  được ghi nhận. Mở form → Settings → tắt &quot;Restrict to
-                  users…&quot; và &quot;Limit to 1 response&quot;, rồi thử gửi
-                  lại.
-                </p>
-              ) : null}
 
               {status === "error" ? (
                 <p className="text-center font-serif text-sm text-[#f0b8a8]">
