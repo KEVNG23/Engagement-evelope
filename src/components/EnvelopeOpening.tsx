@@ -254,7 +254,7 @@ export function EnvelopeOpening({
                 initial={false}
                 animate={
                   letterUp
-                    ? { x: "-50%", y: -120, opacity: 1, scale: 1.04, zIndex: 30 }
+                    ? { x: "-50%", y: -60, opacity: 1, scale: 1.04, zIndex: 30 }
                     : isOpen
                       ? { x: "-50%", y: 20, opacity: 1, scale: 0.95, zIndex: 15 }
                       : { x: "-50%", y: 36, opacity: 0, scale: 0.9, zIndex: 15 }
