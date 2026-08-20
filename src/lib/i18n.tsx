@@ -90,7 +90,7 @@ const messages = {
     saveTheDate: "SAVE THE DATE",
     title: "ENGAGEMENT CEREMONY",
     ceremonyLine: "Engagement ceremony at 9:00 AM",
-    venueLabel: "THE BRIDE'S RESIDENCE",
+    venueLabel: "BRIDE'S RESIDENCE",
     address:
       "616 Le Duc Anh, Binh Hung Hoa B Ward, Binh Tan Dist., Ho Chi Minh City",
     addressOld:
