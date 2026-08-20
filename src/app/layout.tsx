@@ -40,6 +40,12 @@ export default function RootLayout({
           type="image/webp"
           fetchPriority="high"
         />
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/monogram-dt.webp"
+          type="image/webp"
+        />
       </head>
       <body className="antialiased" suppressHydrationWarning>
         {children}

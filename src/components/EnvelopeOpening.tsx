@@ -207,6 +207,19 @@ export function EnvelopeOpening({
                   onLoad={() => setClosedReady(true)}
                   className="envelope-shadow object-contain object-center"
                 />
+                {/* DT monogram centered on the closed lid */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-[22%] z-[21] w-[34%] -translate-x-1/2"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/assets/monogram-dt.webp"
+                    alt=""
+                    draggable={false}
+                    className="h-auto w-full select-none opacity-90"
+                  />
+                </div>
               </motion.div>
 
               {/* Flap only while opening — idle already shows the complete closed envelope */}
@@ -234,6 +247,15 @@ export function EnvelopeOpening({
                       fetchPriority="high"
                       className="pointer-events-none h-full w-full object-cover object-top"
                     />
+                    <div className="pointer-events-none absolute left-1/2 top-[28%] w-[46%] -translate-x-1/2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="/assets/monogram-dt.webp"
+                        alt=""
+                        draggable={false}
+                        className="h-auto w-full select-none opacity-90"
+                      />
+                    </div>
                   </div>
                 </motion.div>
               ) : null}
