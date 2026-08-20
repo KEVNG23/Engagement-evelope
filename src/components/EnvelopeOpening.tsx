@@ -138,7 +138,7 @@ export function EnvelopeOpening({
         <p
           className={`${displayFont.className} text-[9px] uppercase tracking-[0.28em] text-[#f3e8d5] sm:text-[11px] sm:tracking-[0.42em]`}
         >
-          {t("inviteFrom")}
+          YOU&apos;VE GOT INVITED FROM
         </p>
         <h1
           className={`${scriptFont.className} mt-2 text-[clamp(2.4rem,11vw,4.75rem)] leading-[1.08] text-[#fff8ef]`}
