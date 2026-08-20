@@ -210,7 +210,7 @@ export function EnvelopeOpening({
                 {/* DT monogram centered on the closed lid */}
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute left-1/2 top-[22%] z-[21] w-[34%] -translate-x-1/2"
+                  className="pointer-events-none absolute left-1/2 top-[26%] z-[21] w-[20%] -translate-x-1/2"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -247,7 +247,7 @@ export function EnvelopeOpening({
                       fetchPriority="high"
                       className="pointer-events-none h-full w-full object-cover object-top"
                     />
-                    <div className="pointer-events-none absolute left-1/2 top-[28%] w-[46%] -translate-x-1/2">
+                    <div className="pointer-events-none absolute left-1/2 top-[32%] w-[28%] -translate-x-1/2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src="/assets/monogram-dt.webp"
