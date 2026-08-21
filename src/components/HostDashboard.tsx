@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { displayFont } from "@/lib/fonts";
+import {
+  isAttendingValue,
+  type EmailAttendanceFilter,
+} from "@/lib/host-email-filter";
 import { LocaleProvider, useLocale } from "@/lib/i18n";
 import { LanguageToggle } from "./LanguageToggle";
 
@@ -30,12 +34,7 @@ function formatWhen(iso: string, locale: string) {
 }
 
 function isAttending(attend: string) {
-  const value = attend.trim().toLowerCase();
-  return (
-    value.includes("sẽ tham dự") ||
-    value.includes("will attend") ||
-    value.startsWith("có,")
-  );
+  return isAttendingValue(attend);
 }
 
 function isVegetarianYes(value: string) {
@@ -131,6 +130,15 @@ function HostDashboardInner() {
   const [expandAttending, setExpandAttending] = useState(false);
   const [expandDeclining, setExpandDeclining] = useState(false);
   const [expandDetails, setExpandDetails] = useState(false);
+  const [expandMailPreview, setExpandMailPreview] = useState(false);
+  const [showMailPreview, setShowMailPreview] = useState(false);
+  const [mailAttendance, setMailAttendance] =
+    useState<EmailAttendanceFilter>("all");
+  const [mailCategory, setMailCategory] = useState("all");
+  const [mailSubject, setMailSubject] = useState("");
+  const [mailBody, setMailBody] = useState("");
+  const [mailSending, setMailSending] = useState(false);
+  const [mailMessage, setMailMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setInviteUrl(window.location.origin);
@@ -246,6 +254,111 @@ function HostDashboardInner() {
   const visibleAttending = useExpandable(report.attending, expandAttending);
   const visibleDeclining = useExpandable(report.declining, expandDeclining);
   const visibleDetails = useExpandable(rsvps, expandDetails);
+
+  const mailCategoryOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const r of rsvps) {
+      const group = r.guestGroup.trim();
+      if (group) set.add(group);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b, "vi"));
+  }, [rsvps]);
+
+  const mailFilterStats = useMemo(() => {
+    let skippedNoEmail = 0;
+    const withEmail: HostRsvp[] = [];
+
+    for (const r of rsvps) {
+      const attending = isAttending(r.attend);
+      if (mailAttendance === "attending" && !attending) continue;
+      if (mailAttendance === "declining" && attending) continue;
+      if (mailCategory !== "all" && r.guestGroup !== mailCategory) continue;
+
+      if (!r.email?.trim()) {
+        skippedNoEmail += 1;
+        continue;
+      }
+      withEmail.push(r);
+    }
+
+    withEmail.sort((a, b) => a.name.localeCompare(b.name, "vi"));
+    return { withEmail, skippedNoEmail };
+  }, [rsvps, mailAttendance, mailCategory]);
+
+  const visibleMailRecipients = useExpandable(
+    mailFilterStats.withEmail,
+    expandMailPreview,
+  );
+
+  useEffect(() => {
+    if (
+      mailCategory !== "all" &&
+      !mailCategoryOptions.includes(mailCategory)
+    ) {
+      setMailCategory("all");
+    }
+  }, [mailCategory, mailCategoryOptions]);
+
+  async function onSendMail() {
+    const n = mailFilterStats.withEmail.length;
+    if (n === 0) {
+      setMailMessage(t("hostMailZero"));
+      return;
+    }
+    if (!mailSubject.trim() || !mailBody.trim()) return;
+    if (!window.confirm(t("hostMailConfirm").replace("{n}", String(n)))) {
+      return;
+    }
+
+    setMailSending(true);
+    setMailMessage(null);
+    try {
+      const response = await fetch("/api/host/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: mailSubject.trim(),
+          body: mailBody.trim(),
+          attendance: mailAttendance,
+          guestGroup: mailCategory,
+        }),
+      });
+      const data = (await response.json().catch(() => null)) as {
+        error?: string;
+        sent?: number;
+        skippedNoEmail?: number;
+        failed?: unknown[];
+      } | null;
+
+      if (response.status === 401) {
+        setAuth("login");
+        return;
+      }
+      if (response.status === 503 || data?.error === "resend_not_configured") {
+        setMailMessage(t("hostMailNeedResend"));
+        return;
+      }
+      if (data?.error === "no_recipients") {
+        setMailMessage(t("hostMailZero"));
+        return;
+      }
+      if (!response.ok && !data?.sent) {
+        setMailMessage(t("hostMailFail"));
+        return;
+      }
+
+      setMailMessage(
+        t("hostMailOk")
+          .replace("{sent}", String(data?.sent ?? 0))
+          .replace("{skipped}", String(data?.skippedNoEmail ?? 0))
+          .replace("{failed}", String(data?.failed?.length ?? 0)),
+      );
+    } catch {
+      setMailMessage(t("hostMailFail"));
+    } finally {
+      setMailSending(false);
+    }
+  }
 
   async function onLogin(event: FormEvent) {
     event.preventDefault();
@@ -594,6 +707,150 @@ function HostDashboardInner() {
               {syncMessage ? (
                 <p className="mt-3 font-serif text-[13px] leading-relaxed text-[#e0c9a8] sm:text-sm">
                   {syncMessage}
+                </p>
+              ) : null}
+            </section>
+
+            <section className="border border-[#7d4652] bg-[#5a2730]/45 px-4 py-5 print:hidden sm:px-5 sm:py-6">
+              <p className="text-[0.75rem] tracking-[0.14em] text-[#d4b89a]">
+                {t("hostMailTitle")}
+              </p>
+              <p className="mt-2 font-serif text-[13px] leading-relaxed text-[#e0c9a8]/90 sm:text-sm">
+                {t("hostMailHint")}
+              </p>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <label className="block text-[0.7rem] tracking-[0.12em] text-[#d4b89a]">
+                  {t("hostMailAttendance")}
+                  <select
+                    value={mailAttendance}
+                    onChange={(e) =>
+                      setMailAttendance(e.target.value as EmailAttendanceFilter)
+                    }
+                    className="mt-2 w-full border border-[#7d4652] bg-[#3d1418]/60 px-3 py-3 font-serif text-[15px] text-[#f7ecd9] outline-none focus:border-[#e0c9a8]"
+                  >
+                    <option value="all">{t("hostMailAttendanceAll")}</option>
+                    <option value="attending">
+                      {t("hostMailAttendanceYes")}
+                    </option>
+                    <option value="declining">
+                      {t("hostMailAttendanceNo")}
+                    </option>
+                  </select>
+                </label>
+                <label className="block text-[0.7rem] tracking-[0.12em] text-[#d4b89a]">
+                  {t("hostMailCategory")}
+                  <select
+                    value={mailCategory}
+                    onChange={(e) => setMailCategory(e.target.value)}
+                    className="mt-2 w-full border border-[#7d4652] bg-[#3d1418]/60 px-3 py-3 font-serif text-[15px] text-[#f7ecd9] outline-none focus:border-[#e0c9a8]"
+                  >
+                    <option value="all">{t("hostMailCategoryAll")}</option>
+                    {mailCategoryOptions.map((group) => (
+                      <option key={group} value={group}>
+                        {group}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <p className="mt-4 font-serif text-[13px] text-[#e0c9a8] sm:text-sm">
+                {mailFilterStats.withEmail.length === 0
+                  ? t("hostMailNoRecipients")
+                  : t("hostMailRecipients").replace(
+                      "{n}",
+                      String(mailFilterStats.withEmail.length),
+                    )}
+                {mailFilterStats.skippedNoEmail > 0 ? (
+                  <span className="text-[#d4b89a]">
+                    {" "}
+                    {t("hostMailSkippedNoEmail").replace(
+                      "{n}",
+                      String(mailFilterStats.skippedNoEmail),
+                    )}
+                  </span>
+                ) : null}
+              </p>
+
+              {mailFilterStats.withEmail.length > 0 ? (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowMailPreview((v) => !v)}
+                    className="font-serif text-[12px] tracking-[0.1em] text-[#e0c9a8] underline-offset-2 hover:underline"
+                  >
+                    {showMailPreview
+                      ? t("hostMailHidePreview")
+                      : t("hostMailPreview")}
+                  </button>
+                  {showMailPreview ? (
+                    <>
+                      <ul className="mt-3 space-y-1.5 border border-[#7d4652]/60 bg-[#3d1418]/35 px-3 py-3 font-serif text-[13px] text-[#f7ecd9]">
+                        {visibleMailRecipients.map((r) => (
+                          <li key={r.token} className="break-words">
+                            <span className="text-[#e0c9a8]">{r.name}</span>
+                            <span className="text-[#d4b89a]">
+                              {" "}
+                              — {r.email} — {r.guestGroup}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <ExpandControls
+                        total={mailFilterStats.withEmail.length}
+                        expanded={expandMailPreview}
+                        onToggle={() => setExpandMailPreview((v) => !v)}
+                        showMoreLabel={t("hostShowMore")}
+                        showLessLabel={t("hostShowLess")}
+                        showingOfLabel={t("hostShowingOf")}
+                      />
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <label className="mt-4 block text-[0.7rem] tracking-[0.12em] text-[#d4b89a]">
+                {t("hostMailSubject")}
+                <input
+                  type="text"
+                  maxLength={200}
+                  value={mailSubject}
+                  onChange={(e) => setMailSubject(e.target.value)}
+                  placeholder={t("hostMailSubjectPlaceholder")}
+                  className="mt-2 w-full border border-[#7d4652] bg-[#3d1418]/60 px-3 py-3 font-serif text-[15px] text-[#f7ecd9] outline-none placeholder:text-[#c2a08f]/40 focus:border-[#e0c9a8]"
+                />
+              </label>
+
+              <label className="mt-4 block text-[0.7rem] tracking-[0.12em] text-[#d4b89a]">
+                {t("hostMailBody")}
+                <textarea
+                  rows={6}
+                  maxLength={8000}
+                  value={mailBody}
+                  onChange={(e) => setMailBody(e.target.value)}
+                  placeholder={t("hostMailBodyPlaceholder")}
+                  className="mt-2 w-full border border-[#7d4652] bg-[#3d1418]/60 px-3 py-3 font-serif text-[15px] leading-relaxed text-[#f7ecd9] outline-none placeholder:text-[#c2a08f]/40 focus:border-[#e0c9a8]"
+                />
+              </label>
+
+              <button
+                type="button"
+                onClick={() => void onSendMail()}
+                disabled={
+                  mailSending ||
+                  mailFilterStats.withEmail.length === 0 ||
+                  !mailSubject.trim() ||
+                  !mailBody.trim()
+                }
+                className="mt-4 bg-[#e0c9a8] px-4 py-3 font-serif text-[13px] tracking-[0.1em] text-[#3d1418] disabled:opacity-40 sm:text-sm"
+              >
+                {mailSending ? t("hostMailSending") : t("hostMailSend")}
+              </button>
+
+              {mailMessage ? (
+                <p className="mt-3 font-serif text-[13px] leading-relaxed text-[#e0c9a8] sm:text-sm">
+                  {mailMessage}
                 </p>
               ) : null}
             </section>
