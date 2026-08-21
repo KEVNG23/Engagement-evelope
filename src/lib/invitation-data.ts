@@ -19,7 +19,7 @@ export const invitation = {
   timeOfDay: "lúc 9 sáng",
   month: "THÁNG 1",
   year: "2027",
-  lunar: "(Nhằm ngày 25 tháng 11 2026 Âm Lịch)",
+  lunar: "(Nhằm 25.11.2026 Âm Lịch)",
   footer: "Save the date and celebrate this special moment with us",
   openLabel: "Nhấn để mở thiệp",
   openLabelEn: "Click to Open",
@@ -31,6 +31,7 @@ export const wedding = {
   day: "17",
   year: "2027",
   doubleHappiness: "囍",
+  lunar: "(Nhằm 10.12.2026 Âm Lịch)",
 } as const;
 
 export const EASE_LUXURY = [0.22, 1, 0.36, 1] as const;

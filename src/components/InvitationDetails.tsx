@@ -5,6 +5,46 @@ import { useLocale } from "@/lib/i18n";
 import { RevealSection } from "./RevealSection";
 import { RsvpForm } from "./RsvpForm";
 
+function spacedYear(year: string) {
+  return year.split("").join(" ");
+}
+
+function DateBlock({
+  month,
+  weekday,
+  day,
+  year,
+  lunar,
+}: {
+  month: string;
+  weekday: string;
+  day: string;
+  year: string;
+  lunar: string;
+}) {
+  return (
+    <div className="mx-auto mt-5 max-w-sm border-y border-[#a88a64]/55 py-5">
+      <p className="font-serif text-[13px] tracking-[0.42em] text-[#6b4a32] sm:text-sm sm:tracking-[0.48em]">
+        {month}
+      </p>
+      <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 font-serif text-[#4a1b24]">
+        <span className="justify-self-end text-right text-[15px] leading-tight tracking-wide sm:text-lg">
+          {weekday}
+        </span>
+        <span className="px-1 text-5xl font-semibold leading-none sm:text-6xl">
+          {day}
+        </span>
+        <span className="justify-self-start text-left text-[15px] tracking-[0.28em] sm:text-lg sm:tracking-[0.32em]">
+          {spacedYear(year)}
+        </span>
+      </div>
+      <p className="mt-3 font-serif text-[12px] text-[#6b4a32]/90 sm:text-sm">
+        {lunar}
+      </p>
+    </div>
+  );
+}
+
 /**
  * Cream stationery cards on the burgundy page —
  * engagement confirmation, then wedding save-the-date (venue TBA).
@@ -43,29 +83,13 @@ export function InvitationDetails() {
               {invitation.doubleHappiness}
             </p>
 
-            <div className="mx-auto mt-5 max-w-sm border-y border-[#a88a64]/55 py-5">
-              <p className="font-serif text-[13px] tracking-[0.3em] text-[#6b4a32] sm:text-sm sm:tracking-[0.35em]">
-                {t("month")}
-              </p>
-              <p className="mt-3 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1 font-serif text-[#4a1b24]">
-                <span className="text-base tracking-wide sm:text-lg">
-                  {t("weekday")}
-                </span>
-                <span className="text-5xl font-semibold leading-none sm:text-6xl">
-                  {invitation.day}
-                </span>
-                <span className="text-base tracking-wide sm:text-lg">
-                  {t("timeOfDay")}
-                </span>
-              </p>
-              <p className="mt-3 font-serif text-base tracking-[0.2em]">
-                {invitation.year}
-              </p>
-            </div>
-
-            <p className="mt-4 font-serif text-[12px] text-[#6b4a32]/85 sm:text-sm">
-              {t("lunar")}
-            </p>
+            <DateBlock
+              month={t("month")}
+              weekday={t("weekday")}
+              day={invitation.day}
+              year={invitation.year}
+              lunar={t("lunar")}
+            />
 
             <p className="mt-8 font-serif text-[12px] italic leading-relaxed text-[#6b4a32]/90 sm:text-sm">
               {t("footer")}
@@ -113,29 +137,13 @@ export function InvitationDetails() {
               {wedding.doubleHappiness}
             </p>
 
-            <div className="mx-auto mt-5 max-w-sm border-y border-[#a88a64]/55 py-5">
-              <p className="font-serif text-[13px] tracking-[0.3em] text-[#6b4a32] sm:text-sm sm:tracking-[0.35em]">
-                {t("weddingMonth")}
-              </p>
-              <p className="mt-3 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1 font-serif text-[#4a1b24]">
-                <span className="text-base tracking-wide sm:text-lg">
-                  {t("weddingWeekday")}
-                </span>
-                <span className="text-5xl font-semibold leading-none sm:text-6xl">
-                  {wedding.day}
-                </span>
-                <span className="text-base tracking-wide sm:text-lg">
-                  {t("weddingTimeOfDay")}
-                </span>
-              </p>
-              <p className="mt-3 font-serif text-base tracking-[0.2em]">
-                {wedding.year}
-              </p>
-            </div>
-
-            <p className="mt-4 font-serif text-[12px] text-[#6b4a32]/85 sm:text-sm">
-              {t("weddingLunar")}
-            </p>
+            <DateBlock
+              month={t("weddingMonth")}
+              weekday={t("weddingWeekday")}
+              day={wedding.day}
+              year={wedding.year}
+              lunar={t("weddingLunar")}
+            />
 
             <p className="mt-8 font-serif text-[12px] italic leading-relaxed text-[#6b4a32]/90 sm:text-sm">
               {t("weddingFooter")}

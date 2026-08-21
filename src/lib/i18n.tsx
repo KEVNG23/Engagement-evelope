@@ -32,7 +32,7 @@ const messages = {
     weekday: "Thứ Bảy",
     timeOfDay: "lúc 9 sáng",
     month: "THÁNG 1",
-    lunar: "(Nhằm ngày 25 tháng 11 2026 Âm Lịch)",
+    lunar: "(Nhằm 25.11.2026 Âm Lịch)",
     footer: "Save the date and celebrate this special moment with us",
     detailsAria: "Chi tiết lễ đính hôn",
     weddingEyebrow: "SAVE THE DATE",
@@ -45,7 +45,7 @@ const messages = {
     weddingWeekday: "Chủ Nhật",
     weddingTimeOfDay: "",
     weddingMonth: "THÁNG 1",
-    weddingLunar: "",
+    weddingLunar: "(Nhằm 10.12.2026 Âm Lịch)",
     weddingFooter:
       "Kindly save the date — a formal wedding invitation will follow",
     weddingAria: "Lưu ngày lễ thành hôn",
@@ -183,7 +183,7 @@ const messages = {
     weekday: "Saturday",
     timeOfDay: "at 9 AM",
     month: "JANUARY",
-    lunar: "(Lunar calendar: 25 November 2026)",
+    lunar: "(Lunar calendar: 25.11.2026)",
     footer: "Save the date and celebrate this special moment with us",
     detailsAria: "Engagement ceremony details",
     weddingEyebrow: "SAVE THE DATE",
@@ -196,7 +196,11 @@ const messages = {
     weddingWeekday: "Sunday",
     weddingTimeOfDay: "",
     weddingMonth: "JANUARY",
+<<<<<<< HEAD
     weddingLunar: "",
+=======
+    weddingLunar: "(Lunar calendar: 10.12.2026)",
+>>>>>>> 67c45f2 (Format invitation dates like the stationery layout with lunar under the day.)
     weddingFooter:
       "Kindly save the date — a formal wedding invitation will follow",
     weddingAria: "Wedding day save the date",
