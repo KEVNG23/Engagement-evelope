@@ -101,6 +101,17 @@ body::-webkit-scrollbar {
   color: var(--ivory);
 }
 
+@media print {
+  body {
+    background: white !important;
+    color: #3d1418 !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+}
+
 /* GPU-friendly ambient motion (replaces dozens of Framer loops) */
 @keyframes invite-float {
   0%,
