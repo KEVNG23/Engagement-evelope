@@ -8,6 +8,7 @@ import {
   type EmailAttendanceFilter,
 } from "@/lib/host-email-filter";
 import { LocaleProvider, useLocale } from "@/lib/i18n";
+import { HostEmailTemplateEditor } from "./HostEmailTemplateEditor";
 import { LanguageToggle } from "./LanguageToggle";
 
 type HostRsvp = {
@@ -810,29 +811,20 @@ function HostDashboardInner() {
                 </div>
               ) : null}
 
-              <label className="mt-4 block text-[0.7rem] tracking-[0.12em] text-[#d4b89a]">
-                {t("hostMailSubject")}
-                <input
-                  type="text"
-                  maxLength={200}
-                  value={mailSubject}
-                  onChange={(e) => setMailSubject(e.target.value)}
-                  placeholder={t("hostMailSubjectPlaceholder")}
-                  className="mt-2 w-full border border-[#7d4652] bg-[#3d1418]/60 px-3 py-3 font-serif text-[15px] text-[#f7ecd9] outline-none placeholder:text-[#c2a08f]/40 focus:border-[#e0c9a8]"
-                />
-              </label>
-
-              <label className="mt-4 block text-[0.7rem] tracking-[0.12em] text-[#d4b89a]">
-                {t("hostMailBody")}
-                <textarea
-                  rows={6}
-                  maxLength={8000}
-                  value={mailBody}
-                  onChange={(e) => setMailBody(e.target.value)}
-                  placeholder={t("hostMailBodyPlaceholder")}
-                  className="mt-2 w-full border border-[#7d4652] bg-[#3d1418]/60 px-3 py-3 font-serif text-[15px] leading-relaxed text-[#f7ecd9] outline-none placeholder:text-[#c2a08f]/40 focus:border-[#e0c9a8]"
-                />
-              </label>
+              <HostEmailTemplateEditor
+                subject={mailSubject}
+                body={mailBody}
+                onSubjectChange={setMailSubject}
+                onBodyChange={setMailBody}
+                subjectLabel={t("hostMailSubject")}
+                bodyLabel={t("hostMailBody")}
+                subjectPlaceholder={t("hostMailSubjectPlaceholder")}
+                bodyPlaceholder={t("hostMailBodyPlaceholder")}
+                previewLabel={t("hostMailTemplateLabel")}
+                previewNote={t("hostMailTemplateNote")}
+                sampleGuestName={t("hostMailSampleGuest")}
+                ctaLabel={t("hostMailCta")}
+              />
 
               <button
                 type="button"
