@@ -1,14 +1,33 @@
 import { NextResponse } from "next/server";
 import { isHostAuthenticated } from "@/lib/host-auth";
+import {
+  googleSheetCsvUrl,
+  tryAutoRestoreFromGoogleSheet,
+} from "@/lib/google-sheet-sync";
 import { guestGroupLabel } from "@/lib/rsvp";
-import { listRsvps } from "@/lib/rsvp-store";
+import {
+  isLikelyEphemeralStore,
+  listRsvps,
+  resolveDataDir,
+} from "@/lib/rsvp-store";
 
 export async function GET() {
   if (!(await isHostAuthenticated())) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  const records = await listRsvps();
+  let records = await listRsvps();
+  let restored = false;
+
+  // After a redeploy the local file is empty — pull Google Sheet backup if configured.
+  if (records.length === 0 && googleSheetCsvUrl()) {
+    const result = await tryAutoRestoreFromGoogleSheet();
+    if (result?.ok && (result.added > 0 || result.updated > 0)) {
+      restored = true;
+      records = await listRsvps();
+    }
+  }
+
   const rsvps = records.map((r) => ({
     token: r.token,
     name: r.name,
@@ -25,6 +44,12 @@ export async function GET() {
     count: rsvps.length,
     rsvps,
     source: "site_store",
-    note: "Responses submitted through this website. Google Form is a backup sync only.",
+    restored,
+    ephemeral: isLikelyEphemeralStore(),
+    dataDir: resolveDataDir(),
+    googleSheetConfigured: Boolean(googleSheetCsvUrl()),
+    note: isLikelyEphemeralStore()
+      ? "Store is ephemeral on redeploy unless Railway Volume is mounted at /data (or RSVP_DATA_DIR)."
+      : "Store path looks persistent.",
   });
 }

@@ -1,9 +1,12 @@
 import { createRsvpToken, type RsvpRecord } from "./rsvp";
 import { readRsvpMap, writeRsvps } from "./rsvp-store";
 
+export type SheetSyncMode = "merge" | "replace";
+
 export type SheetSyncResult = {
   ok: boolean;
   error?: string;
+  mode: SheetSyncMode;
   added: number;
   updated: number;
   removed: number;
@@ -94,7 +97,6 @@ function toIsoFromSheetTimestamp(raw: string) {
   if (!trimmed) return new Date().toISOString();
   const parsed = new Date(trimmed);
   if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
-  // Google Sheets often uses DD/MM/YYYY HH:mm:ss
   const m = trimmed.match(
     /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/,
   );
@@ -181,7 +183,11 @@ export function parseSheetCsv(csvText: string): SheetRow[] {
 
 export async function syncFromGoogleSheetCsv(
   csvText: string,
+  options?: { mode?: SheetSyncMode },
 ): Promise<SheetSyncResult> {
+  // merge = restore/add only (safe). replace = also delete local rows missing from sheet.
+  const mode: SheetSyncMode = options?.mode === "replace" ? "replace" : "merge";
+
   let sheetRows: SheetRow[];
   try {
     sheetRows = parseSheetCsv(csvText);
@@ -191,6 +197,7 @@ export async function syncFromGoogleSheetCsv(
     return {
       ok: false,
       error: message,
+      mode,
       added: 0,
       updated: 0,
       removed: 0,
@@ -253,24 +260,24 @@ export async function syncFromGoogleSheetCsv(
       continue;
     }
 
-    // Linked to Google before, but row gone → deleted in Form/Sheet
-    if (record.googleKey) {
-      delete next[token];
-      removed += 1;
-      continue;
+    if (mode === "replace") {
+      if (record.googleKey) {
+        delete next[token];
+        removed += 1;
+        continue;
+      }
+
+      const stillOnSheet = sheetRows.some(
+        (r) => normalizeName(r.name) === normalizeName(record.name),
+      );
+      if (sheetRows.length > 0 && !stillOnSheet) {
+        delete next[token];
+        removed += 1;
+        continue;
+      }
     }
 
-    // Website-only: if Sheet has rows and this name is gone, treat as deleted.
-    // If Sheet is empty, keep local-only (avoid wiping on a blank export).
-    const stillOnSheet = sheetRows.some(
-      (r) => normalizeName(r.name) === normalizeName(record.name),
-    );
-    if (sheetRows.length > 0 && !stillOnSheet) {
-      delete next[token];
-      removed += 1;
-    } else {
-      keptLocalOnly += 1;
-    }
+    keptLocalOnly += 1;
   }
 
   for (const row of sheetRows) {
@@ -294,6 +301,7 @@ export async function syncFromGoogleSheetCsv(
 
   return {
     ok: true,
+    mode,
     added,
     updated,
     removed,
@@ -304,4 +312,24 @@ export async function syncFromGoogleSheetCsv(
 
 export function googleSheetCsvUrl() {
   return process.env.GOOGLE_SHEET_CSV_URL?.trim() || "";
+}
+
+export async function tryAutoRestoreFromGoogleSheet() {
+  const csvUrl = googleSheetCsvUrl();
+  if (!csvUrl) return null;
+
+  try {
+    const response = await fetch(csvUrl, {
+      cache: "no-store",
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (compatible; EngagementInvite/1.0; +https://github.com/KEVNG23/Engagement-evelope)",
+      },
+    });
+    if (!response.ok) return null;
+    const csvText = await response.text();
+    return syncFromGoogleSheetCsv(csvText, { mode: "merge" });
+  } catch {
+    return null;
+  }
 }

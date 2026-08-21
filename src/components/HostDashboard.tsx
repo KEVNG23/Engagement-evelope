@@ -74,6 +74,9 @@ function HostDashboardInner() {
   const [deletingToken, setDeletingToken] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const [ephemeral, setEphemeral] = useState(false);
+  const [importCsv, setImportCsv] = useState("");
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     setInviteUrl(window.location.origin);
@@ -105,8 +108,12 @@ function HostDashboardInner() {
           setLive(false);
           return;
         }
-        const data = (await response.json()) as { rsvps?: HostRsvp[] };
+        const data = (await response.json()) as {
+          rsvps?: HostRsvp[];
+          ephemeral?: boolean;
+        };
         applyRsvps(data.rsvps ?? []);
+        setEphemeral(Boolean(data.ephemeral));
         setAuth("ready");
         setLive(true);
       } catch {
@@ -238,7 +245,11 @@ function HostDashboardInner() {
     setSyncing(true);
     setSyncMessage(null);
     try {
-      const response = await fetch("/api/host/sync-google", { method: "POST" });
+      const response = await fetch("/api/host/sync-google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "merge" }),
+      });
       const data = (await response.json().catch(() => null)) as {
         error?: string;
         removed?: number;
@@ -260,13 +271,51 @@ function HostDashboardInner() {
       }
 
       setSyncMessage(
-        `${t("hostSyncOk")} (+${data.added ?? 0} / ~${data.updated ?? 0} / −${data.removed ?? 0})`,
+        `${t("hostSyncOk")} (+${data.added ?? 0} / ~${data.updated ?? 0})`,
       );
       await loadRsvps({ silent: true });
     } catch {
       setSyncMessage(t("hostSyncFail"));
     } finally {
       setSyncing(false);
+    }
+  }
+
+  async function onImportCsv() {
+    const csv = importCsv.trim();
+    if (!csv) return;
+    setImporting(true);
+    setSyncMessage(null);
+    try {
+      const response = await fetch("/api/host/sync-google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ csv, mode: "merge" }),
+      });
+      const data = (await response.json().catch(() => null)) as {
+        error?: string;
+        added?: number;
+        updated?: number;
+      } | null;
+
+      if (response.status === 401) {
+        setAuth("login");
+        return;
+      }
+      if (!response.ok || !data) {
+        setSyncMessage(t("hostSyncFail"));
+        return;
+      }
+
+      setSyncMessage(
+        `${t("hostSyncOk")} (+${data.added ?? 0} / ~${data.updated ?? 0})`,
+      );
+      setImportCsv("");
+      await loadRsvps({ silent: true });
+    } catch {
+      setSyncMessage(t("hostSyncFail"));
+    } finally {
+      setImporting(false);
     }
   }
 
@@ -416,6 +465,39 @@ function HostDashboardInner() {
                 </p>
               ) : null}
             </section>
+
+            {ephemeral || rsvps.length === 0 ? (
+              <section className="border border-[#c47a6a]/55 bg-[#5a2730]/55 px-4 py-5 sm:px-5 sm:py-6">
+                {ephemeral ? (
+                  <p className="font-serif text-[13px] leading-relaxed text-[#f0b8a8] sm:text-sm">
+                    {t("hostEphemeralWarn")}
+                  </p>
+                ) : null}
+                <p
+                  className={`text-[0.75rem] tracking-[0.14em] text-[#d4b89a] ${ephemeral ? "mt-4" : ""}`}
+                >
+                  {t("hostImportTitle")}
+                </p>
+                <p className="mt-2 font-serif text-[13px] leading-relaxed text-[#e0c9a8]/90 sm:text-sm">
+                  {t("hostImportHint")}
+                </p>
+                <textarea
+                  value={importCsv}
+                  onChange={(e) => setImportCsv(e.target.value)}
+                  rows={5}
+                  placeholder={t("hostImportPlaceholder")}
+                  className="mt-3 w-full border border-[#7d4652] bg-[#3d1418]/50 px-3 py-3 font-mono text-[12px] text-[#f7ecd9] outline-none focus:border-[#e0c9a8]"
+                />
+                <button
+                  type="button"
+                  onClick={() => void onImportCsv()}
+                  disabled={importing || !importCsv.trim()}
+                  className="mt-3 bg-[#e0c9a8] px-4 py-3 font-serif text-[13px] tracking-[0.1em] text-[#3d1418] disabled:opacity-40 sm:text-sm"
+                >
+                  {importing ? t("hostImporting") : t("hostImportBtn")}
+                </button>
+              </section>
+            ) : null}
 
             <section className="space-y-4 sm:space-y-5">
               <div className="flex flex-wrap items-end justify-between gap-2">

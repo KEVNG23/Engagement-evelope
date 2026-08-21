@@ -84,7 +84,7 @@ const messages = {
     hostColLink: "Link riêng",
     hostOpen: "Mở",
     hostNote:
-      "Báo cáo lấy từ website. Xóa trên Google Form không tự đổi ở đây — bấm “Đồng bộ Google” (cần Sheet CSV) hoặc Xóa trên báo cáo này.",
+      "Báo cáo lấy từ website. Sau mỗi lần deploy, dữ liệu tạm có thể mất — khôi phục bằng Import CSV từ Google Form, hoặc gắn Volume Railway tại /data.",
     hostLive: "Đang theo dõi trực tiếp",
     hostCsv: "Tải CSV",
     hostPrint: "In / lưu PDF",
@@ -93,11 +93,19 @@ const messages = {
     hostDeleting: "Đang xóa…",
     hostSyncGoogle: "Đồng bộ Google",
     hostSyncing: "Đang đồng bộ…",
-    hostSyncOk: "Đã đồng bộ với Google Sheet.",
+    hostSyncOk: "Đã đồng bộ / khôi phục từ Google.",
     hostSyncNeedSheet:
-      "Chưa đặt GOOGLE_SHEET_CSV_URL trên Railway. Liên kết Form → Sheet, chia sẻ xem được, rồi dùng link export CSV.",
-    hostSyncFail: "Đồng bộ thất bại. Kiểm tra Sheet CSV URL và quyền xem.",
+      "Chưa có Sheet URL — dán CSV bên dưới (Form → Responses → Sheet → File → Download → CSV), hoặc đặt GOOGLE_SHEET_CSV_URL trên Railway.",
+    hostSyncFail: "Đồng bộ thất bại. Kiểm tra CSV / Sheet URL.",
     hostColActions: "Thao tác",
+    hostEphemeralWarn:
+      "Cảnh báo: lưu trữ hiện tại sẽ mất khi Railway redeploy. Thêm Volume mount tại /data (hoặc RSVP_DATA_DIR), và/hoặc Import CSV từ Google Form để khôi phục.",
+    hostImportTitle: "Khôi phục từ Google Form (CSV)",
+    hostImportHint:
+      "Mở Google Form → Responses → liên kết Spreadsheet → File → Download → Comma Separated Values (.csv). Dán toàn bộ nội dung CSV vào đây rồi bấm Khôi phục.",
+    hostImportPlaceholder: "Dán nội dung CSV tại đây…",
+    hostImportBtn: "Khôi phục từ CSV",
+    hostImporting: "Đang khôi phục…",
     rsvpTitle: "THIỆP PHÚC ĐÁP",
     rsvpIntro1:
       "Sự hiện diện của Quý khách sẽ là niềm vinh hạnh và góp phần tạo nên những kỷ niệm đẹp trong ngày vui của chúng tôi.",
@@ -218,7 +226,7 @@ const messages = {
     hostColLink: "Private link",
     hostOpen: "Open",
     hostNote:
-      "Report uses the website store. Deleting in Google Form does not auto-update here — use “Sync Google” (needs Sheet CSV) or Delete on this page.",
+      "Report uses the website store. Redeploys can wipe temporary storage — restore via CSV import from Google Form, or mount a Railway Volume at /data.",
     hostLive: "Live updates on",
     hostCsv: "Download CSV",
     hostPrint: "Print / save PDF",
@@ -227,11 +235,19 @@ const messages = {
     hostDeleting: "Deleting…",
     hostSyncGoogle: "Sync Google",
     hostSyncing: "Syncing…",
-    hostSyncOk: "Synced with Google Sheet.",
+    hostSyncOk: "Synced / restored from Google.",
     hostSyncNeedSheet:
-      "GOOGLE_SHEET_CSV_URL is not set. Link Form → Sheet, share view access, then use the CSV export URL.",
-    hostSyncFail: "Sync failed. Check the Sheet CSV URL and view access.",
+      "No Sheet URL — paste CSV below (Form → Responses → Sheet → File → Download → CSV), or set GOOGLE_SHEET_CSV_URL on Railway.",
+    hostSyncFail: "Sync failed. Check the CSV / Sheet URL.",
     hostColActions: "Actions",
+    hostEphemeralWarn:
+      "Warning: storage is wiped on Railway redeploy. Add a Volume mounted at /data (or RSVP_DATA_DIR), and/or restore with CSV from Google Form.",
+    hostImportTitle: "Restore from Google Form (CSV)",
+    hostImportHint:
+      "Open Google Form → Responses → linked Spreadsheet → File → Download → Comma Separated Values (.csv). Paste the full CSV here, then Restore.",
+    hostImportPlaceholder: "Paste CSV contents here…",
+    hostImportBtn: "Restore from CSV",
+    hostImporting: "Restoring…",
     rsvpTitle: "RSVP",
     rsvpIntro1:
       "Your presence would be our greatest honour and would help make this day unforgettable.",
