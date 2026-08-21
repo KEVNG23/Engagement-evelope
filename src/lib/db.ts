@@ -30,9 +30,9 @@ export function getPool(): Pool {
   return pool;
 }
 
-export async function query<T = any>(
+export async function query<T = unknown>(
   text: string,
-  params?: any[],
+  params?: unknown[],
 ): Promise<T[]> {
   const client = getPool();
   const result = await client.query(text, params);

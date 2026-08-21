@@ -1,5 +1,6 @@
 import { query } from "./db";
 import type { RsvpRecord } from "./rsvp";
+import type { QueryResult } from "pg";
 
 export async function saveRsvp(record: RsvpRecord): Promise<RsvpRecord> {
   await query(
@@ -116,8 +117,12 @@ export async function listRsvps(): Promise<RsvpRecord[]> {
 export async function deleteRsvp(token: string): Promise<boolean> {
   if (!/^[a-f0-9]{32}$/i.test(token)) return false;
 
-  const result = await query(`DELETE FROM rsvps WHERE token = $1`, [token]);
-  return (result as any).rowCount > 0;
+  const pool = (await import("./db")).getPool();
+  const result: QueryResult = await pool.query(
+    `DELETE FROM rsvps WHERE token = $1`,
+    [token],
+  );
+  return result.rowCount !== null && result.rowCount > 0;
 }
 
 export async function readRsvpMap(): Promise<Record<string, RsvpRecord>> {
