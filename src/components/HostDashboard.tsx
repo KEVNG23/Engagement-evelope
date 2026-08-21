@@ -245,17 +245,17 @@ function HostDashboardInner() {
 
   return (
     <main
-      className="invite-scroller relative h-[100dvh] overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] px-4 py-10 text-[#f7ecd9] touch-pan-y sm:px-6"
+      className="invite-scroller relative h-[100dvh] max-h-[100dvh] overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] text-[#f7ecd9] touch-pan-y"
       style={{ WebkitOverflowScrolling: "touch" }}
     >
       <LanguageToggle />
-      <div className="mx-auto w-full max-w-5xl pb-[max(2rem,env(safe-area-inset-bottom))]">
+      <div className="mx-auto w-full max-w-5xl px-3 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(4.25rem,calc(env(safe-area-inset-top)+3.25rem))] sm:px-6 sm:pt-14">
         <p
-          className={`${displayFont.className} text-center text-[clamp(1.5rem,5vw,2.2rem)] tracking-[0.14em]`}
+          className={`${displayFont.className} text-center text-[clamp(1.35rem,6vw,2.2rem)] tracking-[0.12em]`}
         >
           {t("hostTitle")}
         </p>
-        <p className="mt-2 text-center font-serif text-sm text-[#d4b89a]">
+        <p className="mt-2 px-2 text-center font-serif text-[13px] leading-relaxed text-[#d4b89a] sm:text-sm">
           {t("hostSubtitle")}
         </p>
 
@@ -272,7 +272,7 @@ function HostDashboardInner() {
         {auth === "login" ? (
           <form
             onSubmit={onLogin}
-            className="mx-auto mt-12 w-full max-w-sm space-y-4 border border-[#7d4652] bg-[#5a2730]/45 px-5 py-8"
+            className="mx-auto mt-10 w-full max-w-sm space-y-4 border border-[#7d4652] bg-[#5a2730]/45 px-4 py-7 sm:mt-12 sm:px-5 sm:py-8"
           >
             <label className="block text-[0.8rem] tracking-[0.1em] text-[#e0c9a8]">
               {t("hostPassword")}
@@ -281,7 +281,7 @@ function HostDashboardInner() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-2 w-full border border-[#7d4652] bg-[#5a2730]/60 px-3 py-3 font-serif text-[#f7ecd9] outline-none focus:border-[#e0c9a8]"
+                className="mt-2 w-full border border-[#7d4652] bg-[#5a2730]/60 px-3 py-3 font-serif text-[16px] text-[#f7ecd9] outline-none focus:border-[#e0c9a8]"
               />
             </label>
             {loginError ? (
@@ -290,7 +290,7 @@ function HostDashboardInner() {
             <button
               type="submit"
               disabled={loggingIn || !password}
-              className="w-full bg-[#e0c9a8] px-4 py-3 font-serif text-sm uppercase tracking-[0.14em] text-[#3d1418] disabled:opacity-40"
+              className="w-full bg-[#e0c9a8] px-4 py-3.5 font-serif text-sm uppercase tracking-[0.14em] text-[#3d1418] disabled:opacity-40"
             >
               {loggingIn ? t("hostLoggingIn") : t("hostLogin")}
             </button>
@@ -298,26 +298,26 @@ function HostDashboardInner() {
         ) : null}
 
         {auth === "ready" ? (
-          <div className="mt-10 space-y-8">
-            <section className="border border-[#7d4652] bg-[#5a2730]/45 px-5 py-6">
+          <div className="mt-8 space-y-7 sm:mt-10 sm:space-y-8">
+            <section className="border border-[#7d4652] bg-[#5a2730]/45 px-4 py-5 sm:px-5 sm:py-6">
               <p className="text-[0.75rem] tracking-[0.14em] text-[#d4b89a]">
                 {t("hostInviteLink")}
               </p>
-              <p className="mt-2 break-all font-serif text-sm text-[#e0c9a8]">
+              <p className="mt-2 break-all font-serif text-[13px] leading-relaxed text-[#e0c9a8] sm:text-sm">
                 {inviteUrl}
               </p>
-              <div className="mt-4 flex flex-wrap gap-3">
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
                 <button
                   type="button"
                   onClick={copyInvite}
-                  className="bg-[#e0c9a8] px-4 py-2.5 font-serif text-sm tracking-[0.12em] text-[#3d1418]"
+                  className="bg-[#e0c9a8] px-3 py-3 font-serif text-[13px] tracking-[0.1em] text-[#3d1418] sm:px-4 sm:text-sm"
                 >
                   {copied ? t("hostCopied") : t("hostCopyLink")}
                 </button>
                 <button
                   type="button"
                   onClick={() => void loadRsvps()}
-                  className="border border-[#e0c9a8]/50 px-4 py-2.5 font-serif text-sm tracking-[0.12em] text-[#e0c9a8]"
+                  className="border border-[#e0c9a8]/50 px-3 py-3 font-serif text-[13px] tracking-[0.1em] text-[#e0c9a8] sm:px-4 sm:text-sm"
                 >
                   {t("hostRefresh")}
                 </button>
@@ -325,7 +325,7 @@ function HostDashboardInner() {
                   <a
                     href={csvHref}
                     download="rsvp-responses.csv"
-                    className="border border-[#e0c9a8]/50 px-4 py-2.5 font-serif text-sm tracking-[0.12em] text-[#e0c9a8]"
+                    className="border border-[#e0c9a8]/50 px-3 py-3 text-center font-serif text-[13px] tracking-[0.1em] text-[#e0c9a8] sm:px-4 sm:text-sm"
                   >
                     {t("hostCsv")}
                   </a>
@@ -333,42 +333,40 @@ function HostDashboardInner() {
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="border border-[#e0c9a8]/50 px-4 py-2.5 font-serif text-sm tracking-[0.12em] text-[#e0c9a8]"
+                  className="border border-[#e0c9a8]/50 px-3 py-3 font-serif text-[13px] tracking-[0.1em] text-[#e0c9a8] sm:px-4 sm:text-sm"
                 >
                   {t("hostPrint")}
                 </button>
                 <button
                   type="button"
                   onClick={() => void onLogout()}
-                  className="border border-[#e0c9a8]/35 px-4 py-2.5 font-serif text-sm tracking-[0.12em] text-[#d4b89a] print:hidden"
+                  className="col-span-2 border border-[#e0c9a8]/35 px-3 py-3 font-serif text-[13px] tracking-[0.1em] text-[#d4b89a] print:hidden sm:col-span-1 sm:px-4 sm:text-sm"
                 >
                   {t("hostLogout")}
                 </button>
               </div>
             </section>
 
-            <section className="space-y-5">
-              <div className="flex flex-wrap items-end justify-between gap-3">
-                <h2 className="font-serif text-lg tracking-[0.08em] text-[#f7ecd9]">
+            <section className="space-y-4 sm:space-y-5">
+              <div className="flex flex-wrap items-end justify-between gap-2">
+                <h2 className="font-serif text-base tracking-[0.08em] text-[#f7ecd9] sm:text-lg">
                   {t("hostReport")}
                 </h2>
-                <div className="flex flex-wrap items-center gap-3 font-serif text-sm text-[#d4b89a]">
-                  {live ? (
-                    <span className="inline-flex items-center gap-2 text-[#e0c9a8] print:hidden">
-                      <span
-                        aria-hidden
-                        className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#e0c9a8]"
-                      />
-                      {t("hostLive")}
-                    </span>
-                  ) : null}
-                </div>
+                {live ? (
+                  <span className="inline-flex items-center gap-2 font-serif text-[12px] text-[#e0c9a8] print:hidden sm:text-sm">
+                    <span
+                      aria-hidden
+                      className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#e0c9a8]"
+                    />
+                    {t("hostLive")}
+                  </span>
+                ) : null}
               </div>
-              <p className="max-w-3xl font-serif text-sm leading-relaxed text-[#d4b89a]/90">
+              <p className="font-serif text-[13px] leading-relaxed text-[#d4b89a]/90 sm:text-sm">
                 {t("hostNote")}
               </p>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
                 {[
                   { label: t("hostCount"), value: report.total },
                   { label: t("hostAttending"), value: report.attending.length },
@@ -384,20 +382,20 @@ function HostDashboardInner() {
                 ].map((stat) => (
                   <div
                     key={stat.label}
-                    className="border border-[#7d4652] bg-[#5a2730]/45 px-4 py-5 text-center"
+                    className="border border-[#7d4652] bg-[#5a2730]/45 px-3 py-4 text-center sm:px-4 sm:py-5"
                   >
-                    <p className="font-serif text-3xl text-[#f7ecd9]">
+                    <p className="font-serif text-2xl text-[#f7ecd9] sm:text-3xl">
                       {stat.value}
                     </p>
-                    <p className="mt-2 text-[0.7rem] tracking-[0.12em] text-[#d4b89a]">
+                    <p className="mt-1.5 text-[0.65rem] leading-snug tracking-[0.08em] text-[#d4b89a] sm:mt-2 sm:text-[0.7rem] sm:tracking-[0.12em]">
                       {stat.label}
                     </p>
                   </div>
                 ))}
               </div>
 
-              <div className="grid gap-4 lg:grid-cols-2">
-                <div className="border border-[#7d4652] bg-[#5a2730]/35 px-5 py-5">
+              <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
+                <div className="border border-[#7d4652] bg-[#5a2730]/35 px-4 py-4 sm:px-5 sm:py-5">
                   <p className="text-[0.75rem] tracking-[0.14em] text-[#d4b89a]">
                     {t("hostByGroup")}
                   </p>
@@ -406,21 +404,21 @@ function HostDashboardInner() {
                       {t("hostEmpty")}
                     </p>
                   ) : (
-                    <ul className="mt-3 space-y-2 font-serif text-sm text-[#f7ecd9]">
+                    <ul className="mt-3 space-y-2 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
                       {report.groups.map(([group, count]) => (
                         <li
                           key={group}
                           className="flex items-baseline justify-between gap-3 border-b border-[#7d4652]/50 pb-2"
                         >
-                          <span>{group}</span>
-                          <span className="text-[#e0c9a8]">{count}</span>
+                          <span className="min-w-0 break-words">{group}</span>
+                          <span className="shrink-0 text-[#e0c9a8]">{count}</span>
                         </li>
                       ))}
                     </ul>
                   )}
                 </div>
 
-                <div className="border border-[#7d4652] bg-[#5a2730]/35 px-5 py-5">
+                <div className="border border-[#7d4652] bg-[#5a2730]/35 px-4 py-4 sm:px-5 sm:py-5">
                   <p className="text-[0.75rem] tracking-[0.14em] text-[#d4b89a]">
                     {t("hostAllergyList")}
                   </p>
@@ -429,11 +427,14 @@ function HostDashboardInner() {
                       {t("hostNoAllergyNotes")}
                     </p>
                   ) : (
-                    <ul className="mt-3 space-y-2 font-serif text-sm text-[#f7ecd9]">
+                    <ul className="mt-3 space-y-2 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
                       {report.allergyNotes.map((r) => (
-                        <li key={r.token} className="border-b border-[#7d4652]/50 pb-2">
+                        <li
+                          key={r.token}
+                          className="border-b border-[#7d4652]/50 pb-2"
+                        >
                           <span className="text-[#e0c9a8]">{r.name}</span>
-                          <span className="mt-0.5 block text-[#d4b89a]">
+                          <span className="mt-0.5 block break-words text-[#d4b89a]">
                             {r.allergy}
                           </span>
                         </li>
@@ -443,17 +444,17 @@ function HostDashboardInner() {
                 </div>
               </div>
 
-              <div className="grid gap-4 lg:grid-cols-2">
-                <div className="border border-[#7d4652] bg-[#5a2730]/35 px-5 py-5">
+              <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
+                <div className="border border-[#7d4652] bg-[#5a2730]/35 px-4 py-4 sm:px-5 sm:py-5">
                   <p className="text-[0.75rem] tracking-[0.14em] text-[#d4b89a]">
                     {t("hostAttendingList")} ({report.attending.length})
                   </p>
                   {report.attending.length === 0 ? (
                     <p className="mt-3 font-serif text-sm text-[#d4b89a]">—</p>
                   ) : (
-                    <ul className="mt-3 space-y-1.5 font-serif text-sm text-[#f7ecd9]">
+                    <ul className="mt-3 space-y-1.5 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
                       {report.attending.map((r) => (
-                        <li key={r.token}>
+                        <li key={r.token} className="break-words">
                           {r.name}
                           <span className="text-[#d4b89a]"> — {r.guestGroup}</span>
                         </li>
@@ -461,16 +462,16 @@ function HostDashboardInner() {
                     </ul>
                   )}
                 </div>
-                <div className="border border-[#7d4652] bg-[#5a2730]/35 px-5 py-5">
+                <div className="border border-[#7d4652] bg-[#5a2730]/35 px-4 py-4 sm:px-5 sm:py-5">
                   <p className="text-[0.75rem] tracking-[0.14em] text-[#d4b89a]">
                     {t("hostDecliningList")} ({report.declining.length})
                   </p>
                   {report.declining.length === 0 ? (
                     <p className="mt-3 font-serif text-sm text-[#d4b89a]">—</p>
                   ) : (
-                    <ul className="mt-3 space-y-1.5 font-serif text-sm text-[#f7ecd9]">
+                    <ul className="mt-3 space-y-1.5 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
                       {report.declining.map((r) => (
-                        <li key={r.token}>
+                        <li key={r.token} className="break-words">
                           {r.name}
                           <span className="text-[#d4b89a]"> — {r.guestGroup}</span>
                         </li>
@@ -482,11 +483,11 @@ function HostDashboardInner() {
             </section>
 
             <section>
-              <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-                <h2 className="font-serif text-lg tracking-[0.08em] text-[#f7ecd9]">
+              <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+                <h2 className="font-serif text-base tracking-[0.08em] text-[#f7ecd9] sm:text-lg">
                   {t("hostResponses")}
                 </h2>
-                <span className="font-serif text-sm text-[#d4b89a]">
+                <span className="font-serif text-[13px] text-[#d4b89a] sm:text-sm">
                   {t("hostCount")}: {rsvps.length}
                 </span>
               </div>
@@ -496,50 +497,129 @@ function HostDashboardInner() {
               ) : rsvps.length === 0 ? (
                 <p className="font-serif text-sm text-[#d4b89a]">{t("hostEmpty")}</p>
               ) : (
-                <div className="overflow-x-auto border border-[#7d4652]">
-                  <table className="min-w-full border-collapse text-left text-sm">
-                    <thead className="bg-[#5a2730]/80 text-[0.7rem] tracking-[0.1em] text-[#d4b89a]">
-                      <tr>
-                        <th className="px-3 py-3 font-normal">{t("hostColName")}</th>
-                        <th className="px-3 py-3 font-normal">{t("hostColGroup")}</th>
-                        <th className="px-3 py-3 font-normal">{t("hostColAttend")}</th>
-                        <th className="px-3 py-3 font-normal">{t("hostColAllergy")}</th>
-                        <th className="px-3 py-3 font-normal">
-                          {t("hostColVegetarian")}
-                        </th>
-                        <th className="px-3 py-3 font-normal">{t("hostColWhen")}</th>
-                        <th className="px-3 py-3 font-normal print:hidden">
-                          {t("hostColLink")}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rsvps.map((r) => (
-                        <tr
-                          key={r.token}
-                          className="border-t border-[#7d4652]/70 font-serif text-[#f7ecd9]"
-                        >
-                          <td className="px-3 py-3 align-top">{r.name}</td>
-                          <td className="px-3 py-3 align-top">{r.guestGroup}</td>
-                          <td className="px-3 py-3 align-top">{r.attend}</td>
-                          <td className="px-3 py-3 align-top">{r.allergy}</td>
-                          <td className="px-3 py-3 align-top">{r.vegetarian}</td>
-                          <td className="px-3 py-3 align-top whitespace-nowrap">
-                            {formatWhen(r.createdAt, locale)}
-                          </td>
-                          <td className="px-3 py-3 align-top print:hidden">
-                            <Link
-                              href={r.path}
-                              className="text-[#e0c9a8] underline-offset-2 hover:underline"
-                            >
-                              {t("hostOpen")}
-                            </Link>
-                          </td>
+                <>
+                  {/* Mobile: stacked cards */}
+                  <div className="space-y-3 md:hidden">
+                    {rsvps.map((r) => (
+                      <article
+                        key={r.token}
+                        className="border border-[#7d4652] bg-[#5a2730]/45 px-4 py-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="min-w-0 break-words font-serif text-[15px] text-[#f7ecd9]">
+                            {r.name}
+                          </p>
+                          <Link
+                            href={r.path}
+                            className="shrink-0 text-[12px] tracking-[0.1em] text-[#e0c9a8] underline-offset-2"
+                          >
+                            {t("hostOpen")}
+                          </Link>
+                        </div>
+                        <dl className="mt-3 space-y-2 font-serif text-[13px]">
+                          <div>
+                            <dt className="text-[0.65rem] tracking-[0.12em] text-[#d4b89a]">
+                              {t("hostColGroup")}
+                            </dt>
+                            <dd className="mt-0.5 break-words text-[#f7ecd9]">
+                              {r.guestGroup}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="text-[0.65rem] tracking-[0.12em] text-[#d4b89a]">
+                              {t("hostColAttend")}
+                            </dt>
+                            <dd className="mt-0.5 break-words text-[#f7ecd9]">
+                              {r.attend}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="text-[0.65rem] tracking-[0.12em] text-[#d4b89a]">
+                              {t("hostColAllergy")}
+                            </dt>
+                            <dd className="mt-0.5 break-words text-[#f7ecd9]">
+                              {r.allergy}
+                            </dd>
+                          </div>
+                          <div className="flex gap-4">
+                            <div>
+                              <dt className="text-[0.65rem] tracking-[0.12em] text-[#d4b89a]">
+                                {t("hostColVegetarian")}
+                              </dt>
+                              <dd className="mt-0.5 text-[#f7ecd9]">
+                                {r.vegetarian}
+                              </dd>
+                            </div>
+                            <div>
+                              <dt className="text-[0.65rem] tracking-[0.12em] text-[#d4b89a]">
+                                {t("hostColWhen")}
+                              </dt>
+                              <dd className="mt-0.5 text-[#f7ecd9]">
+                                {formatWhen(r.createdAt, locale)}
+                              </dd>
+                            </div>
+                          </div>
+                        </dl>
+                      </article>
+                    ))}
+                  </div>
+
+                  {/* Desktop: table */}
+                  <div className="hidden overflow-x-auto border border-[#7d4652] md:block">
+                    <table className="min-w-full border-collapse text-left text-sm">
+                      <thead className="bg-[#5a2730]/80 text-[0.7rem] tracking-[0.1em] text-[#d4b89a]">
+                        <tr>
+                          <th className="px-3 py-3 font-normal">
+                            {t("hostColName")}
+                          </th>
+                          <th className="px-3 py-3 font-normal">
+                            {t("hostColGroup")}
+                          </th>
+                          <th className="px-3 py-3 font-normal">
+                            {t("hostColAttend")}
+                          </th>
+                          <th className="px-3 py-3 font-normal">
+                            {t("hostColAllergy")}
+                          </th>
+                          <th className="px-3 py-3 font-normal">
+                            {t("hostColVegetarian")}
+                          </th>
+                          <th className="px-3 py-3 font-normal">
+                            {t("hostColWhen")}
+                          </th>
+                          <th className="px-3 py-3 font-normal print:hidden">
+                            {t("hostColLink")}
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {rsvps.map((r) => (
+                          <tr
+                            key={r.token}
+                            className="border-t border-[#7d4652]/70 font-serif text-[#f7ecd9]"
+                          >
+                            <td className="px-3 py-3 align-top">{r.name}</td>
+                            <td className="px-3 py-3 align-top">{r.guestGroup}</td>
+                            <td className="px-3 py-3 align-top">{r.attend}</td>
+                            <td className="px-3 py-3 align-top">{r.allergy}</td>
+                            <td className="px-3 py-3 align-top">{r.vegetarian}</td>
+                            <td className="whitespace-nowrap px-3 py-3 align-top">
+                              {formatWhen(r.createdAt, locale)}
+                            </td>
+                            <td className="px-3 py-3 align-top print:hidden">
+                              <Link
+                                href={r.path}
+                                className="text-[#e0c9a8] underline-offset-2 hover:underline"
+                              >
+                                {t("hostOpen")}
+                              </Link>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </section>
 
