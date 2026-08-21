@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRsvp } from "@/lib/rsvp-store";
+import { getRsvp } from "@/lib/rsvp-store-unified";
 
 type Params = { params: Promise<{ token: string }> };
 

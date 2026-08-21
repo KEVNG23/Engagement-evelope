@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRsvp, saveRsvp } from "@/lib/rsvp-store";
+import { getRsvp, saveRsvp } from "@/lib/rsvp-store-unified";
 
 function validateHostAuth(request: Request) {
   const configured = process.env.HOST_PASSWORD?.trim();

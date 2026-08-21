@@ -9,7 +9,7 @@ import {
   isLikelyEphemeralStore,
   listRsvps,
   resolveDataDir,
-} from "@/lib/rsvp-store";
+} from "@/lib/rsvp-store-unified";
 
 export async function GET() {
   if (!(await isHostAuthenticated())) {
@@ -35,6 +35,7 @@ export async function GET() {
     attend: r.attend,
     allergy: r.allergy,
     vegetarian: r.vegetarian,
+    email: r.email,
     createdAt: r.createdAt,
     path: `/rsvp/${r.token}`,
   }));
@@ -45,10 +46,10 @@ export async function GET() {
     rsvps,
     source: "site_store",
     restored,
-    ephemeral: isLikelyEphemeralStore(),
-    dataDir: resolveDataDir(),
+    ephemeral: await isLikelyEphemeralStore(),
+    dataDir: await resolveDataDir(),
     googleSheetConfigured: Boolean(googleSheetCsvUrl()),
-    note: isLikelyEphemeralStore()
+    note: (await isLikelyEphemeralStore())
       ? "Store is ephemeral on redeploy unless Railway Volume is mounted at /data (or RSVP_DATA_DIR)."
       : "Store path looks persistent.",
   });

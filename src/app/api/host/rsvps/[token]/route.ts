@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isHostAuthenticated } from "@/lib/host-auth";
-import { deleteRsvp } from "@/lib/rsvp-store";
+import { deleteRsvp } from "@/lib/rsvp-store-unified";
 
 type Params = { params: Promise<{ token: string }> };
 

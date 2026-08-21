@@ -1,5 +1,5 @@
 import { RsvpMissingClient, RsvpViewClient } from "@/components/RsvpViewClient";
-import { getRsvp } from "@/lib/rsvp-store";
+import { getRsvp } from "@/lib/rsvp-store-unified";
 
 type PageProps = {
   params: Promise<{ token: string }>;

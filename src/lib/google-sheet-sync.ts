@@ -1,5 +1,5 @@
 import { createRsvpToken, type RsvpRecord } from "./rsvp";
-import { readRsvpMap, writeRsvps } from "./rsvp-store";
+import { readRsvpMap, writeRsvps } from "./rsvp-store-unified";
 
 export type SheetSyncMode = "merge" | "replace";
 

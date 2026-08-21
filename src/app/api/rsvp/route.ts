@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createRsvpToken } from "@/lib/rsvp";
-import { saveRsvp } from "@/lib/rsvp-store";
+import { saveRsvp } from "@/lib/rsvp-store-unified";
 
 const GOOGLE_FORM_ACTION =
   "https://docs.google.com/forms/d/e/1FAIpQLSedJEnrA3OZJobiG4euB2bCMCdyYPafH4pWxZTSjJpiOJUIZA/formResponse";
