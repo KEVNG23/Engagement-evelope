@@ -12,6 +12,7 @@ type RsvpBody = {
   attend?: string;
   allergy?: string;
   vegetarian?: string;
+  email?: string;
 };
 
 async function syncGoogleForm(payload: {
@@ -71,6 +72,7 @@ export async function POST(request: Request) {
   const attend = payload.attend?.trim() ?? "";
   const allergy = payload.allergy?.trim() ?? "";
   const vegetarian = payload.vegetarian?.trim() ?? "";
+  const email = payload.email?.trim() ?? "";
 
   if (!name || !guestGroup || !attend || !allergy || !vegetarian) {
     return NextResponse.json({ ok: false, error: "missing_fields" }, { status: 400 });
@@ -88,6 +90,7 @@ export async function POST(request: Request) {
     attend,
     allergy,
     vegetarian,
+    email: email || undefined,
     createdAt: new Date().toISOString(),
   };
 

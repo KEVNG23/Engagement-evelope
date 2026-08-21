@@ -13,6 +13,7 @@ type HostRsvp = {
   attend: string;
   allergy: string;
   vegetarian: string;
+  email?: string;
   createdAt: string;
   path: string;
 };
@@ -77,6 +78,8 @@ function HostDashboardInner() {
   const [ephemeral, setEphemeral] = useState(false);
   const [importCsv, setImportCsv] = useState("");
   const [importing, setImporting] = useState(false);
+  const [editingEmail, setEditingEmail] = useState<string | null>(null);
+  const [emailDraft, setEmailDraft] = useState("");
 
   useEffect(() => {
     setInviteUrl(window.location.origin);
@@ -238,6 +241,66 @@ function HostDashboardInner() {
       setRsvps((prev) => prev.filter((r) => r.token !== token));
     } finally {
       setDeletingToken(null);
+    }
+  }
+
+  async function onUpdateEmail(token: string, email: string) {
+    try {
+      const response = await fetch("/api/host/rsvps/email", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, email: email.trim() }),
+      });
+      if (response.status === 401) {
+        setAuth("login");
+        return;
+      }
+      if (!response.ok) return;
+      
+      setRsvps((prev) =>
+        prev.map((r) =>
+          r.token === token ? { ...r, email: email.trim() || undefined } : r,
+        ),
+      );
+      setEditingEmail(null);
+      setEmailDraft("");
+    } catch {
+      // Failed to update
+    }
+  }
+
+  function startEditingEmail(token: string, currentEmail?: string) {
+    setEditingEmail(token);
+    setEmailDraft(currentEmail || "");
+  }
+
+  function cancelEditingEmail() {
+    setEditingEmail(null);
+    setEmailDraft("");
+  }
+
+  function exportEmails() {
+    const emails = rsvps
+      .filter((r) => r.email && r.email.trim())
+      .map((r) => `${r.name} <${r.email}>`)
+      .join(", ");
+    
+    if (!emails) {
+      alert("No email addresses available to export.");
+      return;
+    }
+
+    try {
+      navigator.clipboard.writeText(emails);
+      alert(`Copied ${rsvps.filter((r) => r.email).length} email addresses to clipboard!`);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = emails;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      alert(`Copied ${rsvps.filter((r) => r.email).length} email addresses!`);
     }
   }
 
@@ -639,9 +702,19 @@ function HostDashboardInner() {
                 <h2 className="font-serif text-base tracking-[0.08em] text-[#f7ecd9] sm:text-lg">
                   {t("hostResponses")}
                 </h2>
-                <span className="font-serif text-[13px] text-[#d4b89a] sm:text-sm">
-                  {t("hostCount")}: {rsvps.length}
-                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={exportEmails}
+                    disabled={rsvps.filter((r) => r.email).length === 0}
+                    className="font-serif text-[12px] tracking-[0.1em] text-[#e0c9a8] underline-offset-2 hover:underline disabled:opacity-40 disabled:cursor-not-allowed print:hidden"
+                  >
+                    {t("hostEmailExport")}
+                  </button>
+                  <span className="font-serif text-[13px] text-[#d4b89a] sm:text-sm">
+                    {t("hostCount")}: {rsvps.length}
+                  </span>
+                </div>
               </div>
 
               {loadingList ? (
@@ -723,6 +796,49 @@ function HostDashboardInner() {
                               </dd>
                             </div>
                           </div>
+                          <div>
+                            <dt className="text-[0.65rem] tracking-[0.12em] text-[#d4b89a]">
+                              {t("hostColEmail")}
+                            </dt>
+                            <dd className="mt-0.5 break-all text-[#f7ecd9]">
+                              {editingEmail === r.token ? (
+                                <div className="flex gap-2 mt-1">
+                                  <input
+                                    type="email"
+                                    value={emailDraft}
+                                    onChange={(e) => setEmailDraft(e.target.value)}
+                                    placeholder={t("hostEmailPlaceholder")}
+                                    className="flex-1 border border-[#7d4652] bg-[#3d1418] px-2 py-1 text-[13px] text-[#f7ecd9] outline-none focus:border-[#e0c9a8]"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => void onUpdateEmail(r.token, emailDraft)}
+                                    className="text-[12px] text-[#e0c9a8]"
+                                  >
+                                    {t("hostEmailSave")}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={cancelEditingEmail}
+                                    className="text-[12px] text-[#d4b89a]"
+                                  >
+                                    {t("hostEmailCancel")}
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <span>{r.email || "—"}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => startEditingEmail(r.token, r.email)}
+                                    className="text-[12px] text-[#e0c9a8] print:hidden"
+                                  >
+                                    {t("hostEmailEdit")}
+                                  </button>
+                                </div>
+                              )}
+                            </dd>
+                          </div>
                         </dl>
                       </article>
                     ))}
@@ -749,6 +865,9 @@ function HostDashboardInner() {
                             {t("hostColVegetarian")}
                           </th>
                           <th className="px-3 py-3 font-normal">
+                            {t("hostColEmail")}
+                          </th>
+                          <th className="px-3 py-3 font-normal">
                             {t("hostColWhen")}
                           </th>
                           <th className="px-3 py-3 font-normal print:hidden">
@@ -770,6 +889,44 @@ function HostDashboardInner() {
                             <td className="px-3 py-3 align-top">{r.attend}</td>
                             <td className="px-3 py-3 align-top">{r.allergy}</td>
                             <td className="px-3 py-3 align-top">{r.vegetarian}</td>
+                            <td className="px-3 py-3 align-top">
+                              {editingEmail === r.token ? (
+                                <div className="flex gap-2 items-center">
+                                  <input
+                                    type="email"
+                                    value={emailDraft}
+                                    onChange={(e) => setEmailDraft(e.target.value)}
+                                    placeholder={t("hostEmailPlaceholder")}
+                                    className="w-40 border border-[#7d4652] bg-[#3d1418] px-2 py-1 text-sm text-[#f7ecd9] outline-none focus:border-[#e0c9a8]"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => void onUpdateEmail(r.token, emailDraft)}
+                                    className="text-xs text-[#e0c9a8] hover:underline"
+                                  >
+                                    {t("hostEmailSave")}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={cancelEditingEmail}
+                                    className="text-xs text-[#d4b89a] hover:underline"
+                                  >
+                                    {t("hostEmailCancel")}
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <span className="break-all">{r.email || "—"}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => startEditingEmail(r.token, r.email)}
+                                    className="text-xs text-[#e0c9a8] hover:underline print:hidden"
+                                  >
+                                    {t("hostEmailEdit")}
+                                  </button>
+                                </div>
+                              )}
+                            </td>
                             <td className="whitespace-nowrap px-3 py-3 align-top">
                               {formatWhen(r.createdAt, locale)}
                             </td>

@@ -8,6 +8,7 @@ export type RsvpRecord = {
   attend: string;
   allergy: string;
   vegetarian: string;
+  email?: string;
   createdAt: string;
   /** Fingerprint from linked Google Sheet row (Timestamp|name) for sync/delete. */
   googleKey?: string;

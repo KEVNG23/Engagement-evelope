@@ -22,6 +22,7 @@ type SheetRow = {
   attend: string;
   allergy: string;
   vegetarian: string;
+  email?: string;
   createdAt: string;
 };
 
@@ -144,6 +145,7 @@ export function parseSheetCsv(csvText: string): SheetRow[] {
   const attendIdx = findCol(headers, ["tham du", "attend", "attendance"]);
   const allergyIdx = findCol(headers, ["di ung", "allergy", "allerg"]);
   const vegIdx = findCol(headers, ["chay", "vegetarian", "veg"]);
+  const emailIdx = findCol(headers, ["email", "e-mail", "dia chi email", "email address"]);
   const timeIdx = findCol(headers, [
     "timestamp",
     "thoi gian",
@@ -165,6 +167,7 @@ export function parseSheetCsv(csvText: string): SheetRow[] {
     const { guestGroup, guestGroupOther } = parseGuestGroup(groupRaw);
     const createdAt = toIsoFromSheetTimestamp(timestamp);
     const googleKey = `${timestamp || createdAt}|${normalizeName(name)}`;
+    const emailValue = cell(line, emailIdx);
 
     rows.push({
       googleKey,
@@ -174,6 +177,7 @@ export function parseSheetCsv(csvText: string): SheetRow[] {
       attend: cell(line, attendIdx),
       allergy: cell(line, allergyIdx),
       vegetarian: cell(line, vegIdx),
+      email: emailValue || undefined,
       createdAt,
     });
   }
@@ -253,6 +257,7 @@ export async function syncFromGoogleSheetCsv(
         attend: match.attend,
         allergy: match.allergy,
         vegetarian: match.vegetarian,
+        email: match.email || record.email,
         createdAt: match.createdAt || record.createdAt,
         googleKey: match.googleKey,
       };
@@ -291,6 +296,7 @@ export async function syncFromGoogleSheetCsv(
       attend: row.attend,
       allergy: row.allergy,
       vegetarian: row.vegetarian,
+      email: row.email,
       createdAt: row.createdAt,
       googleKey: row.googleKey,
     };

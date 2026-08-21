@@ -33,6 +33,7 @@ export function RsvpForm() {
   const [attend, setAttend] = useState("");
   const [allergy, setAllergy] = useState("");
   const [vegetarian, setVegetarian] = useState("");
+  const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [token, setToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -97,6 +98,7 @@ export function RsvpForm() {
     if (!name.trim() || !guestGroup || !attend || !allergy.trim() || !vegetarian)
       return false;
     if (guestGroup === "Other" && !guestGroupOther.trim()) return false;
+    // Email is optional
     return status !== "submitting";
   }, [
     name,
@@ -132,6 +134,7 @@ export function RsvpForm() {
           attend,
           allergy: allergy.trim(),
           vegetarian,
+          email: email.trim() || undefined,
         }),
       });
 
@@ -155,6 +158,7 @@ export function RsvpForm() {
       setAttend("");
       setAllergy("");
       setVegetarian("");
+      setEmail("");
     } catch {
       setStatus("error");
     }
@@ -404,6 +408,23 @@ export function RsvpForm() {
                     </label>
                   ))}
                 </div>
+              </div>
+
+              <div>
+                <label htmlFor="rsvp-email" className={fieldLabel}>
+                  {t("rsvpEmail")} <span className="text-[#d4b89a] text-xs">(optional)</span>
+                </label>
+                <input
+                  id="rsvp-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t("rsvpEmailPlaceholder")}
+                  className={textInput}
+                />
+                <p className="mt-2 text-xs text-[#d4b89a] leading-relaxed">
+                  {t("rsvpEmailHelp")}
+                </p>
               </div>
 
               {status === "error" ? (
