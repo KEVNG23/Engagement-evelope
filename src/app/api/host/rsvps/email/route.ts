@@ -1,32 +1,10 @@
 import { NextResponse } from "next/server";
+import { isHostAuthenticated } from "@/lib/host-auth";
 import { getRsvp, saveRsvp } from "@/lib/rsvp-store-unified";
 
-function validateHostAuth(request: Request) {
-  const configured = process.env.HOST_PASSWORD?.trim();
-  if (!configured) {
-    return { ok: false as const, status: 503, error: "not_configured" };
-  }
-
-  const authHeader = request.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return { ok: false as const, status: 401, error: "missing_auth" };
-  }
-
-  const token = authHeader.slice(7);
-  if (token !== configured) {
-    return { ok: false as const, status: 401, error: "invalid_auth" };
-  }
-
-  return { ok: true as const };
-}
-
 export async function PATCH(request: Request) {
-  const auth = validateHostAuth(request);
-  if (!auth.ok) {
-    return NextResponse.json(
-      { ok: false, error: auth.error },
-      { status: auth.status },
-    );
+  if (!(await isHostAuthenticated())) {
+    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
   let body: { token?: string; email?: string };
@@ -43,6 +21,13 @@ export async function PATCH(request: Request) {
   if (!token || typeof token !== "string") {
     return NextResponse.json(
       { ok: false, error: "missing_token" },
+      { status: 400 },
+    );
+  }
+
+  if (!/^[a-f0-9]{32}$/i.test(token)) {
+    return NextResponse.json(
+      { ok: false, error: "invalid_token" },
       { status: 400 },
     );
   }
@@ -69,5 +54,9 @@ export async function PATCH(request: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    token,
+    email: updatedRecord.email ?? "",
+  });
 }
