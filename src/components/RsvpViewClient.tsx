@@ -43,9 +43,12 @@ function RsvpViewContent({ rsvp }: ViewProps) {
   ];
 
   return (
-    <main className="relative min-h-[100dvh] bg-[#3d1418] px-4 py-12 text-[#f7ecd9] sm:px-6">
+    <main
+      className="invite-scroller relative h-[100dvh] overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] px-4 py-12 text-[#f7ecd9] touch-pan-y sm:px-6"
+      style={{ WebkitOverflowScrolling: "touch" }}
+    >
       <LanguageToggle />
-      <div className="mx-auto w-full max-w-[620px]">
+      <div className="mx-auto w-full max-w-[620px] pb-[max(2rem,env(safe-area-inset-bottom))]">
         <p
           className={`${displayFont.className} text-center text-[clamp(1.6rem,6vw,2.4rem)] tracking-[0.14em]`}
         >
@@ -93,9 +96,12 @@ function RsvpMissingContent({ token }: MissingProps) {
   }, [token]);
 
   return (
-    <main className="relative min-h-[100dvh] bg-[#3d1418] px-4 py-12 text-[#f7ecd9] sm:px-6">
+    <main
+      className="invite-scroller relative h-[100dvh] overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] px-4 py-12 text-[#f7ecd9] touch-pan-y sm:px-6"
+      style={{ WebkitOverflowScrolling: "touch" }}
+    >
       <LanguageToggle />
-      <div className="mx-auto w-full max-w-[620px] text-center">
+      <div className="mx-auto w-full max-w-[620px] pb-[max(2rem,env(safe-area-inset-bottom))] text-center">
         <p
           className={`${displayFont.className} text-[clamp(1.6rem,6vw,2.4rem)] tracking-[0.14em]`}
         >

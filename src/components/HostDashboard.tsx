@@ -244,9 +244,12 @@ function HostDashboardInner() {
   }, [rsvps, inviteUrl]);
 
   return (
-    <main className="relative min-h-[100dvh] bg-[#3d1418] px-4 py-10 text-[#f7ecd9] sm:px-6">
+    <main
+      className="invite-scroller relative h-[100dvh] overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#3d1418] px-4 py-10 text-[#f7ecd9] touch-pan-y sm:px-6"
+      style={{ WebkitOverflowScrolling: "touch" }}
+    >
       <LanguageToggle />
-      <div className="mx-auto w-full max-w-5xl">
+      <div className="mx-auto w-full max-w-5xl pb-[max(2rem,env(safe-area-inset-bottom))]">
         <p
           className={`${displayFont.className} text-center text-[clamp(1.5rem,5vw,2.2rem)] tracking-[0.14em]`}
         >
