@@ -74,7 +74,8 @@ const messages = {
     hostColLink: "Link riêng",
     hostOpen: "Mở",
     hostNote:
-      "Bảng này lấy từ dữ liệu website (ổn định hơn Google Form). Google Form chỉ là bản sao dự phòng — không đọc ngược từ Google.",
+      "Bảng này lấy từ dữ liệu website (ổn định hơn Google Form). Google Form chỉ là bản sao dự phòng — không đọc ngược từ Google. Danh sách tự cập nhật khi có phúc đáp mới.",
+    hostLive: "Đang theo dõi trực tiếp",
     hostCsv: "Tải CSV",
     rsvpTitle: "THIỆP PHÚC ĐÁP",
     rsvpIntro1:
@@ -186,7 +187,8 @@ const messages = {
     hostColLink: "Private link",
     hostOpen: "Open",
     hostNote:
-      "This table reads from the website database (more reliable than Google Form). Google Form is backup-only — we cannot pull responses back from Google.",
+      "This table reads from the website database (more reliable than Google Form). Google Form is backup-only — we cannot pull responses back from Google. The list updates automatically when new RSVPs arrive.",
+    hostLive: "Live updates on",
     hostCsv: "Download CSV",
     rsvpTitle: "RSVP",
     rsvpIntro1:

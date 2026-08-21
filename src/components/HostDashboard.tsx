@@ -38,37 +38,82 @@ function HostDashboardInner() {
   const [loadingList, setLoadingList] = useState(false);
   const [inviteUrl, setInviteUrl] = useState("");
   const [copied, setCopied] = useState(false);
+  const [live, setLive] = useState(false);
 
   useEffect(() => {
     setInviteUrl(window.location.origin);
   }, []);
 
-  const loadRsvps = useCallback(async () => {
-    setLoadingList(true);
-    try {
-      const response = await fetch("/api/host/rsvps", { cache: "no-store" });
-      if (response.status === 401) {
-        setAuth("login");
-        setRsvps([]);
-        return;
-      }
-      if (!response.ok) {
-        setAuth("login");
-        return;
-      }
-      const data = (await response.json()) as { rsvps?: HostRsvp[] };
-      setRsvps(data.rsvps ?? []);
-      setAuth("ready");
-    } catch {
-      setAuth("login");
-    } finally {
-      setLoadingList(false);
-    }
+  const applyRsvps = useCallback((next: HostRsvp[]) => {
+    setRsvps((prev) => {
+      const prevKey = prev.map((r) => `${r.token}:${r.createdAt}`).join("|");
+      const nextKey = next.map((r) => `${r.token}:${r.createdAt}`).join("|");
+      if (prevKey === nextKey) return prev;
+      return next;
+    });
   }, []);
+
+  const loadRsvps = useCallback(
+    async (opts?: { silent?: boolean }) => {
+      const silent = opts?.silent ?? false;
+      if (!silent) setLoadingList(true);
+      try {
+        const response = await fetch("/api/host/rsvps", { cache: "no-store" });
+        if (response.status === 401) {
+          setAuth("login");
+          setRsvps([]);
+          setLive(false);
+          return;
+        }
+        if (!response.ok) {
+          setAuth("login");
+          setLive(false);
+          return;
+        }
+        const data = (await response.json()) as { rsvps?: HostRsvp[] };
+        applyRsvps(data.rsvps ?? []);
+        setAuth("ready");
+        setLive(true);
+      } catch {
+        if (!silent) {
+          setAuth("login");
+          setLive(false);
+        }
+      } finally {
+        if (!silent) setLoadingList(false);
+      }
+    },
+    [applyRsvps],
+  );
 
   useEffect(() => {
     void loadRsvps();
   }, [loadRsvps]);
+
+  // Auto-refresh while host dashboard is open (no manual refresh needed)
+  useEffect(() => {
+    if (auth !== "ready") return;
+
+    let cancelled = false;
+
+    const tick = () => {
+      if (cancelled) return;
+      if (document.visibilityState === "hidden") return;
+      void loadRsvps({ silent: true });
+    };
+
+    const id = window.setInterval(tick, 4000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") tick();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [auth, loadRsvps]);
 
   async function onLogin(event: FormEvent) {
     event.preventDefault();
@@ -243,13 +288,24 @@ function HostDashboardInner() {
             </section>
 
             <section>
-              <div className="mb-4 flex items-end justify-between gap-3">
+              <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <h2 className="font-serif text-lg tracking-[0.08em] text-[#f7ecd9]">
                   {t("hostResponses")}
                 </h2>
-                <p className="font-serif text-sm text-[#d4b89a]">
-                  {t("hostCount")}: {rsvps.length}
-                </p>
+                <div className="flex flex-wrap items-center gap-3 font-serif text-sm text-[#d4b89a]">
+                  {live ? (
+                    <span className="inline-flex items-center gap-2 text-[#e0c9a8]">
+                      <span
+                        aria-hidden
+                        className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#e0c9a8]"
+                      />
+                      {t("hostLive")}
+                    </span>
+                  ) : null}
+                  <span>
+                    {t("hostCount")}: {rsvps.length}
+                  </span>
+                </div>
               </div>
               <p className="mb-5 max-w-3xl font-serif text-sm leading-relaxed text-[#d4b89a]/90">
                 {t("hostNote")}
