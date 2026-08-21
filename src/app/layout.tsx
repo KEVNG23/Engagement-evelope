@@ -43,7 +43,7 @@ export default function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="/assets/monogram-dt.webp"
+          href="/assets/monogram-dt.webp?v=2"
           type="image/webp"
         />
       </head>

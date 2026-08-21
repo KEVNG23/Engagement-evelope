@@ -71,6 +71,9 @@ function HostDashboardInner() {
   const [inviteUrl, setInviteUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [live, setLive] = useState(false);
+  const [deletingToken, setDeletingToken] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setInviteUrl(window.location.origin);
@@ -213,6 +216,60 @@ function HostDashboardInner() {
     }
   }
 
+  async function onDelete(token: string) {
+    if (!window.confirm(t("hostDeleteConfirm"))) return;
+    setDeletingToken(token);
+    try {
+      const response = await fetch(`/api/host/rsvps/${token}`, {
+        method: "DELETE",
+      });
+      if (response.status === 401) {
+        setAuth("login");
+        return;
+      }
+      if (!response.ok) return;
+      setRsvps((prev) => prev.filter((r) => r.token !== token));
+    } finally {
+      setDeletingToken(null);
+    }
+  }
+
+  async function onSyncGoogle() {
+    setSyncing(true);
+    setSyncMessage(null);
+    try {
+      const response = await fetch("/api/host/sync-google", { method: "POST" });
+      const data = (await response.json().catch(() => null)) as {
+        error?: string;
+        removed?: number;
+        added?: number;
+        updated?: number;
+      } | null;
+
+      if (response.status === 401) {
+        setAuth("login");
+        return;
+      }
+      if (response.status === 503 || data?.error === "google_sheet_not_configured") {
+        setSyncMessage(t("hostSyncNeedSheet"));
+        return;
+      }
+      if (!response.ok || !data) {
+        setSyncMessage(t("hostSyncFail"));
+        return;
+      }
+
+      setSyncMessage(
+        `${t("hostSyncOk")} (+${data.added ?? 0} / ~${data.updated ?? 0} / −${data.removed ?? 0})`,
+      );
+      await loadRsvps({ silent: true });
+    } catch {
+      setSyncMessage(t("hostSyncFail"));
+    } finally {
+      setSyncing(false);
+    }
+  }
+
   const csvHref = useMemo(() => {
     if (!rsvps.length) return "";
     const header = [
@@ -321,6 +378,14 @@ function HostDashboardInner() {
                 >
                   {t("hostRefresh")}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => void onSyncGoogle()}
+                  disabled={syncing}
+                  className="border border-[#e0c9a8]/50 px-3 py-3 font-serif text-[13px] tracking-[0.1em] text-[#e0c9a8] disabled:opacity-40 sm:px-4 sm:text-sm"
+                >
+                  {syncing ? t("hostSyncing") : t("hostSyncGoogle")}
+                </button>
                 {csvHref ? (
                   <a
                     href={csvHref}
@@ -345,6 +410,11 @@ function HostDashboardInner() {
                   {t("hostLogout")}
                 </button>
               </div>
+              {syncMessage ? (
+                <p className="mt-3 font-serif text-[13px] leading-relaxed text-[#e0c9a8] sm:text-sm">
+                  {syncMessage}
+                </p>
+              ) : null}
             </section>
 
             <section className="space-y-4 sm:space-y-5">
@@ -509,12 +579,24 @@ function HostDashboardInner() {
                           <p className="min-w-0 break-words font-serif text-[15px] text-[#f7ecd9]">
                             {r.name}
                           </p>
-                          <Link
-                            href={r.path}
-                            className="shrink-0 text-[12px] tracking-[0.1em] text-[#e0c9a8] underline-offset-2"
-                          >
-                            {t("hostOpen")}
-                          </Link>
+                          <div className="flex shrink-0 items-center gap-3">
+                            <Link
+                              href={r.path}
+                              className="text-[12px] tracking-[0.1em] text-[#e0c9a8] underline-offset-2"
+                            >
+                              {t("hostOpen")}
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => void onDelete(r.token)}
+                              disabled={deletingToken === r.token}
+                              className="text-[12px] tracking-[0.1em] text-[#f0b8a8] disabled:opacity-40 print:hidden"
+                            >
+                              {deletingToken === r.token
+                                ? t("hostDeleting")
+                                : t("hostDelete")}
+                            </button>
+                          </div>
                         </div>
                         <dl className="mt-3 space-y-2 font-serif text-[13px]">
                           <div>
@@ -590,6 +672,9 @@ function HostDashboardInner() {
                           <th className="px-3 py-3 font-normal print:hidden">
                             {t("hostColLink")}
                           </th>
+                          <th className="px-3 py-3 font-normal print:hidden">
+                            {t("hostColActions")}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -613,6 +698,18 @@ function HostDashboardInner() {
                               >
                                 {t("hostOpen")}
                               </Link>
+                            </td>
+                            <td className="px-3 py-3 align-top print:hidden">
+                              <button
+                                type="button"
+                                onClick={() => void onDelete(r.token)}
+                                disabled={deletingToken === r.token}
+                                className="text-[#f0b8a8] underline-offset-2 hover:underline disabled:opacity-40"
+                              >
+                                {deletingToken === r.token
+                                  ? t("hostDeleting")
+                                  : t("hostDelete")}
+                              </button>
                             </td>
                           </tr>
                         ))}

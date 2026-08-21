@@ -214,7 +214,7 @@ export function EnvelopeOpening({
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/assets/monogram-dt.webp"
+                    src="/assets/monogram-dt.webp?v=2"
                     alt=""
                     draggable={false}
                     className="h-auto w-full select-none opacity-90"
@@ -250,7 +250,7 @@ export function EnvelopeOpening({
                     <div className="pointer-events-none absolute left-[53%] top-[32%] w-[28%] -translate-x-1/2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src="/assets/monogram-dt.webp"
+                        src="/assets/monogram-dt.webp?v=2"
                         alt=""
                         draggable={false}
                         className="h-auto w-full select-none opacity-90"

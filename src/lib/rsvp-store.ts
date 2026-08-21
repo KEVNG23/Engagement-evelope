@@ -45,3 +45,20 @@ export async function listRsvps(): Promise<RsvpRecord[]> {
     a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0,
   );
 }
+
+export async function deleteRsvp(token: string) {
+  if (!/^[a-f0-9]{32}$/i.test(token)) return false;
+  const records = await readAll();
+  if (!records[token]) return false;
+  delete records[token];
+  await writeAll(records);
+  return true;
+}
+
+export async function writeRsvps(records: Record<string, RsvpRecord>) {
+  await writeAll(records);
+}
+
+export async function readRsvpMap() {
+  return readAll();
+}

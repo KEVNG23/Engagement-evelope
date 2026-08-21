@@ -84,10 +84,20 @@ const messages = {
     hostColLink: "Link riêng",
     hostOpen: "Mở",
     hostNote:
-      "Báo cáo tự cập nhật khi có phúc đáp mới. Dữ liệu lấy từ website (Google Form chỉ là bản sao dự phòng).",
+      "Báo cáo lấy từ website. Xóa trên Google Form không tự đổi ở đây — bấm “Đồng bộ Google” (cần Sheet CSV) hoặc Xóa trên báo cáo này.",
     hostLive: "Đang theo dõi trực tiếp",
     hostCsv: "Tải CSV",
     hostPrint: "In / lưu PDF",
+    hostDelete: "Xóa",
+    hostDeleteConfirm: "Xóa phúc đáp này khỏi báo cáo website?",
+    hostDeleting: "Đang xóa…",
+    hostSyncGoogle: "Đồng bộ Google",
+    hostSyncing: "Đang đồng bộ…",
+    hostSyncOk: "Đã đồng bộ với Google Sheet.",
+    hostSyncNeedSheet:
+      "Chưa đặt GOOGLE_SHEET_CSV_URL trên Railway. Liên kết Form → Sheet, chia sẻ xem được, rồi dùng link export CSV.",
+    hostSyncFail: "Đồng bộ thất bại. Kiểm tra Sheet CSV URL và quyền xem.",
+    hostColActions: "Thao tác",
     rsvpTitle: "THIỆP PHÚC ĐÁP",
     rsvpIntro1:
       "Sự hiện diện của Quý khách sẽ là niềm vinh hạnh và góp phần tạo nên những kỷ niệm đẹp trong ngày vui của chúng tôi.",
@@ -208,10 +218,20 @@ const messages = {
     hostColLink: "Private link",
     hostOpen: "Open",
     hostNote:
-      "This report updates automatically when new RSVPs arrive. Data comes from the website store (Google Form is backup-only).",
+      "Report uses the website store. Deleting in Google Form does not auto-update here — use “Sync Google” (needs Sheet CSV) or Delete on this page.",
     hostLive: "Live updates on",
     hostCsv: "Download CSV",
     hostPrint: "Print / save PDF",
+    hostDelete: "Delete",
+    hostDeleteConfirm: "Remove this RSVP from the website report?",
+    hostDeleting: "Deleting…",
+    hostSyncGoogle: "Sync Google",
+    hostSyncing: "Syncing…",
+    hostSyncOk: "Synced with Google Sheet.",
+    hostSyncNeedSheet:
+      "GOOGLE_SHEET_CSV_URL is not set. Link Form → Sheet, share view access, then use the CSV export URL.",
+    hostSyncFail: "Sync failed. Check the Sheet CSV URL and view access.",
+    hostColActions: "Actions",
     rsvpTitle: "RSVP",
     rsvpIntro1:
       "Your presence would be our greatest honour and would help make this day unforgettable.",

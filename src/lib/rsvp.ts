@@ -9,6 +9,8 @@ export type RsvpRecord = {
   allergy: string;
   vegetarian: string;
   createdAt: string;
+  /** Fingerprint from linked Google Sheet row (Timestamp|name) for sync/delete. */
+  googleKey?: string;
 };
 
 export function createRsvpToken() {
