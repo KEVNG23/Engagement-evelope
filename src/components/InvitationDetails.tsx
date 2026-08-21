@@ -5,10 +5,6 @@ import { useLocale } from "@/lib/i18n";
 import { RevealSection } from "./RevealSection";
 import { RsvpForm } from "./RsvpForm";
 
-function spacedYear(year: string) {
-  return year.split("").join(" ");
-}
-
 function DateBlock({
   month,
   weekday,
@@ -34,8 +30,8 @@ function DateBlock({
         <span className="px-1 text-5xl font-semibold leading-none sm:text-6xl">
           {day}
         </span>
-        <span className="justify-self-start text-left text-[15px] tracking-[0.28em] sm:text-lg sm:tracking-[0.32em]">
-          {spacedYear(year)}
+        <span className="justify-self-start text-left font-serif text-base tracking-[0.2em] sm:text-lg">
+          {year}
         </span>
       </div>
       <p className="mt-3 font-serif text-[12px] text-[#6b4a32]/90 sm:text-sm">
