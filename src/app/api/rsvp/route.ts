@@ -74,7 +74,7 @@ export async function POST(request: Request) {
   const vegetarian = payload.vegetarian?.trim() ?? "";
   const email = payload.email?.trim() ?? "";
 
-  if (!name || !guestGroup || !attend || !allergy || !vegetarian) {
+  if (!name || !guestGroup || !attend || !allergy || !vegetarian || !email) {
     return NextResponse.json({ ok: false, error: "missing_fields" }, { status: 400 });
   }
   if (guestGroup === "Other" && !guestGroupOther) {
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     attend,
     allergy,
     vegetarian,
-    email: email || undefined,
+    email,
     createdAt: new Date().toISOString(),
   };
 

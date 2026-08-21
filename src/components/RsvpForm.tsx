@@ -95,10 +95,9 @@ export function RsvpForm() {
       status === "missing"
     )
       return false;
-    if (!name.trim() || !guestGroup || !attend || !allergy.trim() || !vegetarian)
+    if (!name.trim() || !guestGroup || !attend || !allergy.trim() || !vegetarian || !email.trim())
       return false;
     if (guestGroup === "Other" && !guestGroupOther.trim()) return false;
-    // Email is optional
     return status !== "submitting";
   }, [
     name,
@@ -107,6 +106,7 @@ export function RsvpForm() {
     attend,
     allergy,
     vegetarian,
+    email,
     status,
   ]);
 
@@ -412,11 +412,12 @@ export function RsvpForm() {
 
               <div>
                 <label htmlFor="rsvp-email" className={fieldLabel}>
-                  {t("rsvpEmail")} <span className="text-[#d4b89a] text-xs">(optional)</span>
+                  {t("rsvpEmail")} <span className="text-[#f0b8a8]">*</span>
                 </label>
                 <input
                   id="rsvp-email"
                   type="email"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t("rsvpEmailPlaceholder")}
