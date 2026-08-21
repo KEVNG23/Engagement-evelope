@@ -22,9 +22,11 @@ async function syncGoogleForm(payload: {
   attend: string;
   allergy: string;
   vegetarian: string;
+  email: string;
 }) {
   const body = new URLSearchParams();
   body.set("entry.877086558", payload.name);
+  body.set("entry.1779168092", payload.email);
   if (payload.guestGroup === "Other") {
     body.set("entry.1498135098", "__other_option__");
     body.set(
@@ -49,8 +51,12 @@ async function syncGoogleForm(payload: {
     redirect: "manual",
   });
 
+  // Google often returns 200 (success page) or 302; 400 means validation failed.
   if (response.status === 401 || response.status === 403) {
     return { synced: false as const, error: "form_requires_sign_in" as const };
+  }
+  if (response.status === 400) {
+    return { synced: false as const, error: "form_validation_failed" as const };
   }
   if (response.status >= 400 && response.status !== 302) {
     return { synced: false as const, error: "google_rejected" as const };
