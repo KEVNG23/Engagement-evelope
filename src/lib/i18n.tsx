@@ -196,11 +196,7 @@ const messages = {
     weddingWeekday: "Sunday",
     weddingTimeOfDay: "",
     weddingMonth: "JANUARY",
-<<<<<<< HEAD
-    weddingLunar: "",
-=======
     weddingLunar: "(Lunar calendar: 10.12.2026)",
->>>>>>> 67c45f2 (Format invitation dates like the stationery layout with lunar under the day.)
     weddingFooter:
       "Kindly save the date — a formal wedding invitation will follow",
     weddingAria: "Wedding day save the date",
