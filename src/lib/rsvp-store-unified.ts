@@ -5,22 +5,40 @@
 
 import type { RsvpRecord } from "./rsvp";
 
-const USE_POSTGRES = !!process.env.DATABASE_URL;
+type StoreImpl = {
+  saveRsvp: (record: RsvpRecord) => Promise<RsvpRecord>;
+  getRsvp: (token: string) => Promise<RsvpRecord | null>;
+  listRsvps: () => Promise<RsvpRecord[]>;
+  deleteRsvp: (token: string) => Promise<boolean>;
+  readRsvpMap: () => Promise<Record<string, RsvpRecord>>;
+  writeRsvps: (records: Record<string, RsvpRecord>) => Promise<void>;
+  resolveDataDir?: () => string;
+  isLikelyEphemeralStore?: () => boolean;
+};
 
-let impl: typeof import("./rsvp-store") | typeof import("./rsvp-store-pg");
+let impl: StoreImpl | null = null;
+let implPromise: Promise<StoreImpl> | null = null;
 
-async function getImpl() {
-  if (!impl) {
-    if (USE_POSTGRES) {
-      impl = await import("./rsvp-store-pg");
-      // Run migrations on first import
-      const { runMigrations } = await import("./db-migrate");
-      await runMigrations();
-    } else {
-      impl = await import("./rsvp-store");
-    }
+async function loadImpl(): Promise<StoreImpl> {
+  if (process.env.DATABASE_URL?.trim()) {
+    // Dynamic path keeps `pg` out of the default webpack compile graph.
+    const pgStore = await import("./rsvp-store-pg");
+    const { runMigrations } = await import("./db-migrate");
+    await runMigrations();
+    return pgStore;
   }
-  return impl;
+  return import("./rsvp-store");
+}
+
+async function getImpl(): Promise<StoreImpl> {
+  if (impl) return impl;
+  if (!implPromise) {
+    implPromise = loadImpl().then((store) => {
+      impl = store;
+      return store;
+    });
+  }
+  return implPromise;
 }
 
 export async function saveRsvp(record: RsvpRecord): Promise<RsvpRecord> {
@@ -60,7 +78,7 @@ export async function resolveDataDir(): Promise<string> {
   if (typeof store.resolveDataDir === "function") {
     return store.resolveDataDir();
   }
-  return "unknown";
+  return "postgresql";
 }
 
 export async function isLikelyEphemeralStore(): Promise<boolean> {
