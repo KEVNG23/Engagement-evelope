@@ -61,6 +61,52 @@ function countBy(items: string[]) {
   return [...map.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 }
 
+const LIST_PAGE_SIZE = 8;
+
+function ExpandControls({
+  total,
+  expanded,
+  onToggle,
+  showMoreLabel,
+  showLessLabel,
+  showingOfLabel,
+}: {
+  total: number;
+  expanded: boolean;
+  onToggle: () => void;
+  showMoreLabel: string;
+  showLessLabel: string;
+  showingOfLabel: string;
+}) {
+  if (total <= LIST_PAGE_SIZE) return null;
+  const shown = expanded ? total : LIST_PAGE_SIZE;
+  return (
+    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 print:hidden">
+      <p className="font-serif text-[12px] text-[#d4b89a]">
+        {showingOfLabel
+          .replace("{shown}", String(shown))
+          .replace("{total}", String(total))}
+      </p>
+      <button
+        type="button"
+        onClick={onToggle}
+        className="font-serif text-[12px] tracking-[0.1em] text-[#e0c9a8] underline-offset-2 hover:underline sm:text-[13px]"
+      >
+        {expanded
+          ? showLessLabel
+          : `${showMoreLabel} (+${total - LIST_PAGE_SIZE})`}
+      </button>
+    </div>
+  );
+}
+
+function useExpandable<T>(items: T[], expanded: boolean) {
+  return useMemo(() => {
+    if (expanded || items.length <= LIST_PAGE_SIZE) return items;
+    return items.slice(0, LIST_PAGE_SIZE);
+  }, [items, expanded]);
+}
+
 function HostDashboardInner() {
   const { t, locale } = useLocale();
   const [auth, setAuth] = useState<AuthState>("checking");
@@ -80,9 +126,26 @@ function HostDashboardInner() {
   const [importing, setImporting] = useState(false);
   const [editingEmail, setEditingEmail] = useState<string | null>(null);
   const [emailDraft, setEmailDraft] = useState("");
+  const [expandGroups, setExpandGroups] = useState(false);
+  const [expandAllergy, setExpandAllergy] = useState(false);
+  const [expandAttending, setExpandAttending] = useState(false);
+  const [expandDeclining, setExpandDeclining] = useState(false);
+  const [expandDetails, setExpandDetails] = useState(false);
 
   useEffect(() => {
     setInviteUrl(window.location.origin);
+  }, []);
+
+  useEffect(() => {
+    const expandAllForPrint = () => {
+      setExpandGroups(true);
+      setExpandAllergy(true);
+      setExpandAttending(true);
+      setExpandDeclining(true);
+      setExpandDetails(true);
+    };
+    window.addEventListener("beforeprint", expandAllForPrint);
+    return () => window.removeEventListener("beforeprint", expandAllForPrint);
   }, []);
 
   const applyRsvps = useCallback((next: HostRsvp[]) => {
@@ -177,6 +240,12 @@ function HostDashboardInner() {
       groups,
     };
   }, [rsvps]);
+
+  const visibleGroups = useExpandable(report.groups, expandGroups);
+  const visibleAllergy = useExpandable(report.allergyNotes, expandAllergy);
+  const visibleAttending = useExpandable(report.attending, expandAttending);
+  const visibleDeclining = useExpandable(report.declining, expandDeclining);
+  const visibleDetails = useExpandable(rsvps, expandDetails);
 
   async function onLogin(event: FormEvent) {
     event.preventDefault();
@@ -619,17 +688,27 @@ function HostDashboardInner() {
                       {t("hostEmpty")}
                     </p>
                   ) : (
-                    <ul className="mt-3 space-y-2 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
-                      {report.groups.map(([group, count]) => (
-                        <li
-                          key={group}
-                          className="flex items-baseline justify-between gap-3 border-b border-[#7d4652]/50 pb-2"
-                        >
-                          <span className="min-w-0 break-words">{group}</span>
-                          <span className="shrink-0 text-[#e0c9a8]">{count}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="mt-3 space-y-2 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
+                        {visibleGroups.map(([group, count]) => (
+                          <li
+                            key={group}
+                            className="flex items-baseline justify-between gap-3 border-b border-[#7d4652]/50 pb-2"
+                          >
+                            <span className="min-w-0 break-words">{group}</span>
+                            <span className="shrink-0 text-[#e0c9a8]">{count}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <ExpandControls
+                        total={report.groups.length}
+                        expanded={expandGroups}
+                        onToggle={() => setExpandGroups((v) => !v)}
+                        showMoreLabel={t("hostShowMore")}
+                        showLessLabel={t("hostShowLess")}
+                        showingOfLabel={t("hostShowingOf")}
+                      />
+                    </>
                   )}
                 </div>
 
@@ -642,19 +721,29 @@ function HostDashboardInner() {
                       {t("hostNoAllergyNotes")}
                     </p>
                   ) : (
-                    <ul className="mt-3 space-y-2 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
-                      {report.allergyNotes.map((r) => (
-                        <li
-                          key={r.token}
-                          className="border-b border-[#7d4652]/50 pb-2"
-                        >
-                          <span className="text-[#e0c9a8]">{r.name}</span>
-                          <span className="mt-0.5 block break-words text-[#d4b89a]">
-                            {r.allergy}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="mt-3 space-y-2 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
+                        {visibleAllergy.map((r) => (
+                          <li
+                            key={r.token}
+                            className="border-b border-[#7d4652]/50 pb-2"
+                          >
+                            <span className="text-[#e0c9a8]">{r.name}</span>
+                            <span className="mt-0.5 block break-words text-[#d4b89a]">
+                              {r.allergy}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <ExpandControls
+                        total={report.allergyNotes.length}
+                        expanded={expandAllergy}
+                        onToggle={() => setExpandAllergy((v) => !v)}
+                        showMoreLabel={t("hostShowMore")}
+                        showLessLabel={t("hostShowLess")}
+                        showingOfLabel={t("hostShowingOf")}
+                      />
+                    </>
                   )}
                 </div>
               </div>
@@ -667,14 +756,24 @@ function HostDashboardInner() {
                   {report.attending.length === 0 ? (
                     <p className="mt-3 font-serif text-sm text-[#d4b89a]">—</p>
                   ) : (
-                    <ul className="mt-3 space-y-1.5 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
-                      {report.attending.map((r) => (
-                        <li key={r.token} className="break-words">
-                          {r.name}
-                          <span className="text-[#d4b89a]"> — {r.guestGroup}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="mt-3 space-y-1.5 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
+                        {visibleAttending.map((r) => (
+                          <li key={r.token} className="break-words">
+                            {r.name}
+                            <span className="text-[#d4b89a]"> — {r.guestGroup}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <ExpandControls
+                        total={report.attending.length}
+                        expanded={expandAttending}
+                        onToggle={() => setExpandAttending((v) => !v)}
+                        showMoreLabel={t("hostShowMore")}
+                        showLessLabel={t("hostShowLess")}
+                        showingOfLabel={t("hostShowingOf")}
+                      />
+                    </>
                   )}
                 </div>
                 <div className="border border-[#7d4652] bg-[#5a2730]/35 px-4 py-4 sm:px-5 sm:py-5">
@@ -684,14 +783,24 @@ function HostDashboardInner() {
                   {report.declining.length === 0 ? (
                     <p className="mt-3 font-serif text-sm text-[#d4b89a]">—</p>
                   ) : (
-                    <ul className="mt-3 space-y-1.5 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
-                      {report.declining.map((r) => (
-                        <li key={r.token} className="break-words">
-                          {r.name}
-                          <span className="text-[#d4b89a]"> — {r.guestGroup}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="mt-3 space-y-1.5 font-serif text-[13px] text-[#f7ecd9] sm:text-sm">
+                        {visibleDeclining.map((r) => (
+                          <li key={r.token} className="break-words">
+                            {r.name}
+                            <span className="text-[#d4b89a]"> — {r.guestGroup}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <ExpandControls
+                        total={report.declining.length}
+                        expanded={expandDeclining}
+                        onToggle={() => setExpandDeclining((v) => !v)}
+                        showMoreLabel={t("hostShowMore")}
+                        showLessLabel={t("hostShowLess")}
+                        showingOfLabel={t("hostShowingOf")}
+                      />
+                    </>
                   )}
                 </div>
               </div>
@@ -725,7 +834,7 @@ function HostDashboardInner() {
                 <>
                   {/* Mobile: stacked cards */}
                   <div className="space-y-3 md:hidden">
-                    {rsvps.map((r) => (
+                    {visibleDetails.map((r) => (
                       <article
                         key={r.token}
                         className="border border-[#7d4652] bg-[#5a2730]/45 px-4 py-4"
@@ -879,7 +988,7 @@ function HostDashboardInner() {
                         </tr>
                       </thead>
                       <tbody>
-                        {rsvps.map((r) => (
+                        {visibleDetails.map((r) => (
                           <tr
                             key={r.token}
                             className="border-t border-[#7d4652]/70 font-serif text-[#f7ecd9]"
@@ -955,6 +1064,15 @@ function HostDashboardInner() {
                       </tbody>
                     </table>
                   </div>
+
+                  <ExpandControls
+                    total={rsvps.length}
+                    expanded={expandDetails}
+                    onToggle={() => setExpandDetails((v) => !v)}
+                    showMoreLabel={t("hostShowMore")}
+                    showLessLabel={t("hostShowLess")}
+                    showingOfLabel={t("hostShowingOf")}
+                  />
                 </>
               )}
             </section>

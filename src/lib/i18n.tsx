@@ -104,6 +104,9 @@ const messages = {
     hostEmailCancel: "Hủy",
     hostEmailPlaceholder: "Thêm email...",
     hostEmailExport: "Xuất danh sách email",
+    hostShowMore: "Xem thêm",
+    hostShowLess: "Thu gọn",
+    hostShowingOf: "Hiển thị {shown}/{total}",
     hostEphemeralWarn:
       "Cảnh báo: lưu trữ hiện tại sẽ mất khi Railway redeploy. Thêm Volume mount tại /data (hoặc RSVP_DATA_DIR), và/hoặc Import CSV từ Google Form để khôi phục.",
     hostImportTitle: "Khôi phục từ Google Form (CSV)",
@@ -255,6 +258,9 @@ const messages = {
     hostEmailCancel: "Cancel",
     hostEmailPlaceholder: "Add email...",
     hostEmailExport: "Export email list",
+    hostShowMore: "Show more",
+    hostShowLess: "Show less",
+    hostShowingOf: "Showing {shown}/{total}",
     hostEphemeralWarn:
       "Warning: storage is wiped on Railway redeploy. Add a Volume mounted at /data (or RSVP_DATA_DIR), and/or restore with CSV from Google Form.",
     hostImportTitle: "Restore from Google Form (CSV)",
