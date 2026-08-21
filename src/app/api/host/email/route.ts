@@ -106,13 +106,20 @@ export async function POST(request: Request) {
   const failed: { name: string; email: string; error: string }[] = [];
   let sent = 0;
 
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    request.headers.get("origin") ||
+    undefined;
+
   for (let i = 0; i < withEmail.length; i += 1) {
     const guest = withEmail[i];
     try {
       await sendGuestEmail({
         to: guest.email,
         subject: applyNameTemplate(subject, guest.name),
-        text: applyNameTemplate(body, guest.name),
+        bodyText: applyNameTemplate(body, guest.name),
+        guestName: guest.name,
+        siteUrl: origin,
       });
       sent += 1;
     } catch (error) {

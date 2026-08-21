@@ -109,7 +109,7 @@ const messages = {
     hostShowingOf: "Hiển thị {shown}/{total}",
     hostMailTitle: "Gửi email hàng loạt",
     hostMailHint:
-      "Lọc theo tham dự và nhóm khách, rồi gửi email tới mọi người trong bộ lọc có địa chỉ email. Dùng {{name}} để chèn tên khách.",
+      "Lọc theo tham dự và nhóm khách, rồi gửi email tới mọi người trong bộ lọc có địa chỉ email. Dùng {{name}} để chèn tên khách. Email gửi đi sẽ dùng mẫu thiệp burgundy / kem giống website.",
     hostMailAttendance: "Tham dự",
     hostMailAttendanceAll: "Tất cả",
     hostMailAttendanceYes: "Sẽ tham dự",
@@ -289,7 +289,7 @@ const messages = {
     hostShowingOf: "Showing {shown}/{total}",
     hostMailTitle: "Bulk email",
     hostMailHint:
-      "Filter by attendance and guest group, then email everyone in that filter who has an address. Use {{name}} to insert the guest’s name.",
+      "Filter by attendance and guest group, then email everyone in that filter who has an address. Use {{name}} to insert the guest’s name. Messages use a burgundy / cream stationery template matching the site.",
     hostMailAttendance: "Attendance",
     hostMailAttendanceAll: "Everyone",
     hostMailAttendanceYes: "Attending",

@@ -1,4 +1,8 @@
 import { Resend } from "resend";
+import {
+  renderInvitationEmailHtml,
+  renderInvitationEmailText,
+} from "./email-template";
 
 export function resendConfigured() {
   return Boolean(
@@ -28,19 +32,30 @@ export function applyNameTemplate(template: string, name: string) {
 export async function sendGuestEmail(opts: {
   to: string;
   subject: string;
-  text: string;
+  /** Host-composed body (already personalized). */
+  bodyText: string;
+  guestName: string;
+  siteUrl?: string;
 }) {
   const from = getResendFrom();
   if (!from) {
     throw new Error("RESEND_FROM is not set");
   }
 
+  const content = {
+    guestName: opts.guestName,
+    subject: opts.subject,
+    bodyText: opts.bodyText,
+    siteUrl: opts.siteUrl,
+  };
+
   const resend = getClient();
   const { data, error } = await resend.emails.send({
     from,
     to: opts.to,
     subject: opts.subject,
-    text: opts.text,
+    text: renderInvitationEmailText(content),
+    html: renderInvitationEmailHtml(content),
   });
 
   if (error) {
