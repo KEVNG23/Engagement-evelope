@@ -38,3 +38,10 @@ export async function getRsvp(token: string) {
   const records = await readAll();
   return records[token] ?? null;
 }
+
+export async function listRsvps(): Promise<RsvpRecord[]> {
+  const records = await readAll();
+  return Object.values(records).sort((a, b) =>
+    a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0,
+  );
+}
