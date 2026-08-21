@@ -166,7 +166,7 @@ export function EnvelopeOpening({
         className={`relative z-20 w-full max-w-[min(84vw,340px)] shrink-0 ${
           !reduceMotion && !isOpen ? "invite-float" : ""
         }`}
-        animate={isOpen ? { y: 12 } : { y: 0 }}
+        animate={{ y: 0 }}
         transition={luxuryTransition(0.45)}
       >
         <button
@@ -382,27 +382,38 @@ export function EnvelopeOpening({
         </button>
       </motion.div>
 
-      {finished ? (
-        <div className="relative z-10 mt-6 flex shrink-0 flex-col items-center gap-2 text-center">
+      {/* Fixed-height slot so the hint can fade in without shifting the envelope */}
+      <div className="relative z-10 mt-5 flex h-[4.5rem] w-full shrink-0 flex-col items-center justify-center gap-1.5 text-center">
+        <motion.div
+          initial={false}
+          animate={{ opacity: finished ? 1 : 0 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className={
+            finished
+              ? "flex flex-col items-center gap-1.5"
+              : "pointer-events-none flex flex-col items-center gap-1.5"
+          }
+          aria-hidden={!finished}
+        >
           <p className="font-serif text-[11px] tracking-[0.28em] text-[#d4b98a]/90">
             {t("scrollDetails")}
           </p>
           <motion.span
             aria-hidden
             className="text-[#d4b98a]"
-            animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
+            animate={
+              finished && !reduceMotion ? { y: [0, 6, 0] } : { y: 0 }
+            }
             transition={{
               duration: 1.4,
-              repeat: Infinity,
+              repeat: finished && !reduceMotion ? Infinity : 0,
               ease: "easeInOut",
             }}
           >
             ↓
           </motion.span>
-        </div>
-      ) : (
-        <div className="mt-6 min-h-[1rem]" aria-hidden />
-      )}
+        </motion.div>
+      </div>
     </section>
   );
 }
